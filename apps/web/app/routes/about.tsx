@@ -7,7 +7,7 @@ import { ABOUT, SITE, withSubject } from "@aihot/industry/site";
 import { organizationLd, pageMeta } from "../lib/seo";
 import { Kicker } from "../components/ui/Kicker";
 import { buttonClass } from "../components/ui/Controls";
-import { IconArrowRight, IconArrowUpRight } from "../components/icons";
+import { IconArrowRight } from "../components/icons";
 import { SignalRiver, type RiverSource } from "../features/about/SignalRiver";
 
 /** Shared caches may keep this page for five minutes. */
@@ -237,15 +237,6 @@ export default function AboutPage() {
         </div>
       </header>
 
-      <section aria-labelledby="acknowledgments" className="mt-9 rounded-card border border-line bg-bg-sunk px-5 py-6 sm:mt-10 sm:px-7 sm:py-7">
-        <p className="eyebrow">开源鸣谢</p>
-        <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
-          <h2 id="acknowledgments" className="section-title">感谢卡哥 · {ABOUT.acknowledgments.name}</h2>
-          <a href={ABOUT.acknowledgments.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[13px] text-ink-3 underline-offset-4 hover:text-ink hover:underline">查看原始开源项目 <IconArrowUpRight size={14} /></a>
-        </div>
-        <p className="mt-3 max-w-[56em] text-[14px] leading-[1.9] text-ink-3">{ABOUT.acknowledgments.description}</p>
-      </section>
-
       <section aria-labelledby="how" className="mt-12">
         <h2 id="how" className="section-title">从公开信源，到清晰可读的进展</h2>
         <p className="mt-2 text-[13px] leading-relaxed text-ink-3">采集、归并、筛选与成刊。以下数字来自站内公开数据。</p>
@@ -288,7 +279,7 @@ export default function AboutPage() {
       </p>
 
       <footer className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5 text-[12.5px] text-ink-4">
-        <span>{SITE.footerNote}</span>
+        {SITE.footerNote && <span>{SITE.footerNote}</span>}
         <nav className="flex gap-5" aria-label="规则与隐私">
           <Link to="/terms" className="transition-colors hover:text-accent">
             使用规则

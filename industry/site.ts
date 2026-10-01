@@ -28,7 +28,7 @@ export const SITE = {
   /** 对外联系邮箱（选填）：使用规则、llms.txt、响应头里会写。 */
   contactEmail: null as string | null,
   /** 页脚的一行小字（选填）。 */
-  footerNote: "基于数字生命卡兹克（卡哥）的开源框架改造",
+  footerNote: null as string | null,
   /** 中国大陆网站的 ICP 备案号（选填），填了就显示在页脚并链接到工信部备案系统。 */
   icp: null as string | null,
   /** 结构化数据里的网站运营者（搜索引擎用）。 */
@@ -66,12 +66,6 @@ export const ABOUT = {
     avatarSourceId?: string | null;
     wechat?: { title: string; note: string };
     feishu?: { title: string; note: string };
-  },
-  /** 原始框架作者与上游出处；行业改造沿用 MIT 并保留版权声明。 */
-  acknowledgments: {
-    name: "数字生命卡兹克",
-    description: "原始框架由 AI 自媒体博主数字生命卡兹克（卡哥）创作并开源。PrecisionAGHOT 在此基础上面向全球农业科技进行定制，感谢卡哥提供的采集、筛选、事件归组与日报框架。",
-    url: "https://github.com/KKKKhazix/AIHOT",
   },
   /** 页面底部的版权与下架说明（结尾会接“反馈页”的链接）。 */
   copyright: `${SITE.name} 是聚合摘要和阅读索引，原文版权归各来源所有。如果你是来源方，希望更正、下架或调整展示方式，可以通过`,
