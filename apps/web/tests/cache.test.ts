@@ -6,6 +6,7 @@ import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import { after, before, test } from "node:test";
 import { fileURLToPath } from "node:url";
+import type { FeedItemSummary, TimelineCard } from "@aihot/contracts/site";
 import { CATEGORY_KEYS } from "@aihot/contracts/taxonomy";
 import { releaseBoundCache } from "../app/lib/api.server.ts";
 
@@ -15,20 +16,28 @@ let logs = "";
 let deadline: number;
 let refreshAt: string;
 let metaDelayMs = 0;
+let timelineCards: TimelineCard[] = [];
+let poolItems: FeedItemSummary[] = [];
 const apiCookies: Array<string | undefined> = [];
+const apiRequests: URL[] = [];
 const api = createServer((req, res) => {
   const url = new URL(req.url!, "http://api.local");
   apiCookies.push(req.headers.cookie);
+  apiRequests.push(url);
   res.setHeader("Content-Type", "application/json");
   if (url.pathname === "/api/site/meta") {
     const respond = () => res.end(JSON.stringify({ changelogVersion: "2026-09-28T12:00" }));
     return metaDelayMs ? setTimeout(respond, metaDelayMs) : respond();
   }
   if (url.pathname === "/api/site/timeline") {
-    const filters = { channel: "all", category: url.searchParams.get("category"), tag: null, topic: null };
+    const filters = { channel: url.searchParams.get("channel") ?? "all", category: url.searchParams.get("category"), tag: url.searchParams.get("tag"), topic: url.searchParams.get("topic") };
     res.setHeader("X-Accel-Expires", `@${deadline}`);
     res.setHeader("Cache-Control", "public, max-age=30, s-maxage=30");
-    return res.end(JSON.stringify({ filters, cards: [], nextCursor: null, refreshAt, dayCounts: [], hot: null, generatedAt: "2026-09-28T00:00:00Z" }));
+    return res.end(JSON.stringify({ filters, cards: timelineCards, nextCursor: null, refreshAt, dayCounts: {}, hot: null, generatedAt: "2026-09-28T00:00:00Z" }));
+  }
+  if (url.pathname === "/api/site/pool") {
+    const filters = { channel: url.searchParams.get("channel") ?? "all", category: url.searchParams.get("category"), tag: url.searchParams.get("tag"), topic: url.searchParams.get("topic"), q: url.searchParams.get("q"), tab: url.searchParams.get("tab") === "relevance" ? "relevance" : "time" };
+    return res.end(JSON.stringify({ filters, items: poolItems, page: 1, pageCount: 1, total: poolItems.length, todayCount: 0, freshness: "2026-09-28T00:00:00Z", generatedAt: "2026-09-28T00:00:00Z" }));
   }
   if (url.pathname === "/api/site/hot") return res.end(JSON.stringify({ entries: [] }));
   if (url.pathname === "/api/site/echo-client") return res.end(JSON.stringify({ forwarded: req.headers["x-forwarded-for"], real: req.headers["x-real-ip"] }));
@@ -109,6 +118,91 @@ test("HTML and navigation share freshness; cookies do not personalize public res
   assert.equal(signedIn.headers.get("Set-Cookie"), null);
   assert.equal(await signedIn.text(), await plain.text());
   assert.ok(apiCookies.every((cookie) => !cookie));
+});
+
+const sourceReport: FeedItemSummary = {
+  id: "manual-source-report", title: "自动转向终端兼容性更新（测试）", summary: "人工整理的来源摘要，用于验证未精选稿件仍可阅读。", reason: null,
+  source: { name: "农业装备测试来源" }, publishedAt: "2026-09-28T00:00:00Z", timelineAt: "2026-09-28T00:00:00Z",
+  category: "guidance", tags: ["自动转向"], score: null, selected: false, channel: "news", x: null,
+};
+
+test("home renders source reports in HTML and navigation when selection is empty, preserving filters", async () => {
+  poolItems = [sourceReport];
+  try {
+    const html = await fetch(`${origin}/`);
+    assert.equal(html.status, 200);
+    const page = await html.text();
+    assert.match(page, /最新动态/);
+    assert.ok(page.includes(sourceReport.title) && page.includes(sourceReport.source.name) && page.includes(sourceReport.summary!));
+    assert.ok(page.includes(`/items/${sourceReport.id}`));
+    const query = new URLSearchParams({ category: "guidance", tag: "自动转向", channel: "firstParty" });
+    for (const pathname of ["/", "/_.data"]) {
+      const start = apiRequests.length;
+      const res = await fetch(`${origin}${pathname}?${query}`);
+      assert.equal(res.status, 200);
+      const body = await res.text();
+      assert.ok(body.includes(sourceReport.title) && body.includes(sourceReport.summary!) && body.includes(sourceReport.source.name), pathname);
+      const requests = apiRequests.slice(start).filter((u) => u.pathname === "/api/site/timeline" || u.pathname === "/api/site/pool");
+      assert.deepEqual(requests.map((u) => u.pathname), ["/api/site/timeline", "/api/site/pool"]);
+      for (const request of requests) {
+        assert.equal(request.searchParams.get("category"), "guidance");
+        assert.equal(request.searchParams.get("tag"), "自动转向");
+        assert.equal(request.searchParams.get("channel"), "firstParty");
+      }
+    }
+  } finally {
+    poolItems = [];
+  }
+});
+
+test("home shows recent source reports alongside selection in HTML and navigation", async () => {
+  const selected = { ...sourceReport, id: "selected-report", title: "精选自动转向进展（测试）", selected: true, score: 85 };
+  timelineCards = [{ key: selected.id, anchorAt: selected.timelineAt, item: selected, group: null }];
+  poolItems = [sourceReport];
+  try {
+    for (const pathname of ["/", "/_.data"]) {
+      const start = apiRequests.length;
+      const res = await fetch(origin + pathname);
+      assert.equal(res.status, 200);
+      const body = await res.text();
+      assert.ok(body.includes(selected.title), pathname);
+      assert.ok(body.includes(sourceReport.title), pathname);
+      if (pathname === "/") assert.ok(body.indexOf(sourceReport.title) < body.indexOf(selected.title), pathname);
+      assert.deepEqual(apiRequests.slice(start).filter((u) => u.pathname === "/api/site/timeline" || u.pathname === "/api/site/pool").map((u) => u.pathname), ["/api/site/timeline", "/api/site/pool"]);
+    }
+  } finally {
+    timelineCards = [];
+    poolItems = [];
+  }
+});
+
+test("all forwards the topic to the pool and preserves it in HTML search and navigation results", async () => {
+  poolItems = [sourceReport];
+  try {
+    const start = apiRequests.length;
+    const html = await fetch(`${origin}/all?topic=auto-steering`);
+    assert.equal(html.status, 200);
+    const page = await html.text();
+    assert.ok(page.includes(sourceReport.title) && page.includes(sourceReport.summary!) && page.includes(sourceReport.source.name));
+    assert.match(page, /name="topic"[^>]*value="auto-steering"/);
+    assert.match(page, /<link[^>]*rel="canonical"[^>]*href="[^"]*\/all\?topic=auto-steering"/);
+    assert.match(page, /href="\/all\?topic=auto-steering&amp;category=guidance"/);
+    const request = apiRequests.slice(start).filter((u) => u.pathname === "/api/site/pool");
+    assert.equal(request.length, 1);
+    assert.equal(request[0]!.searchParams.get("topic"), "auto-steering");
+
+    const query = new URLSearchParams({ topic: "auto-steering", q: "终端", category: "guidance", tag: "自动转向", channel: "firstParty", tab: "relevance" });
+    const searchStart = apiRequests.length;
+    const navigation = await fetch(`${origin}/all.data?${query}`);
+    assert.equal(navigation.status, 200);
+    const body = await navigation.text();
+    assert.ok(body.includes("auto-steering") && body.includes(sourceReport.title) && body.includes(sourceReport.summary!));
+    const searchRequests = apiRequests.slice(searchStart).filter((u) => u.pathname === "/api/site/pool");
+    assert.equal(searchRequests.length, 1);
+    for (const [key, value] of query) assert.equal(searchRequests[0]!.searchParams.get(key), value);
+  } finally {
+    poolItems = [];
+  }
 });
 
 test("missing routes cannot be hidden by a root-only request; errors and redirects stay uncached", async () => {

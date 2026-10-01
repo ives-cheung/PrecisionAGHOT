@@ -1,5 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { IconArrowUp } from "../icons";
+import { Link } from "react-router";
+import { SITE } from "@aihot/industry/site";
+import { Wordmark } from "../Logo";
+import { IconArrowUp, IconSearch } from "../icons";
+
+export function MobileHeader() {
+  return (
+    <header className="flex h-16 items-center justify-between gap-4 border-b border-line lg:hidden">
+      <Link to="/" aria-label={`${SITE.name} 首页`} className="min-w-0 text-ink">
+        <Wordmark size={19} />
+      </Link>
+      <Link to="/all?search=1" aria-label="搜索行业动态" className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-ink-3 transition-colors hover:bg-bg-sunk hover:text-ink">
+        <IconSearch size={19} />
+      </Link>
+    </header>
+  );
+}
 
 /** A thin accent line while a navigation is in flight (shown only if it takes a moment). */
 export function NavigationProgress({ active }: { active: boolean }) {

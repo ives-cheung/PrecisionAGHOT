@@ -55,7 +55,7 @@ const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayout
 /** A main-column card: 17px title, 24px padding. */
 function Panel({ id, title, sub, right, children, className = "" }: { id?: string; title: ReactNode; sub?: ReactNode; right?: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <section id={id} className={`card scroll-mt-[64px] p-5 lg:p-6 ${className}`}>
+    <section id={id} className={`scroll-mt-[64px] border-t border-line py-5 lg:py-6 ${className}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-[17px] font-[650] leading-[1.5] text-ink">{title}</h2>
@@ -71,7 +71,7 @@ function Panel({ id, title, sub, right, children, className = "" }: { id?: strin
 /** A rail card: 14px title, 22px padding. */
 function RailCard({ title, right, children, className = "" }: { title: ReactNode; right?: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <section className={`card p-5 lg:p-[22px] ${className}`}>
+    <section className={`border-t border-line py-5 ${className}`}>
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="text-[14px] font-[650] text-ink">{title}</h2>
         {right && <span className="num text-[11.5px] text-ink-4">{right}</span>}
@@ -206,7 +206,7 @@ export default function StoryPage() {
           热点事件
           <Badge tone={status.tone}>{status.label}</Badge>
         </div>
-        <h1 className="mt-2.5 text-[27px] font-bold leading-[1.5] tracking-[-0.01em] text-ink lg:mt-3 lg:text-[36px] lg:font-[730]">{story.title}</h1>
+        <h1 className="mt-3 text-[28px] font-semibold leading-[1.45] tracking-[-0.025em] text-ink sm:text-[36px]">{story.title}</h1>
         <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-[12.5px] text-ink-3">
           <span className="inline-flex items-center gap-1.5">
             <IconDoc size={15} className="text-ink-4" />
@@ -240,9 +240,9 @@ export default function StoryPage() {
         />
       </div>
 
-      <div className="mt-5 grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-6 2xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="mt-5 grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:mt-6 xl:grid-cols-[minmax(0,1fr)_260px] xl:gap-10">
         {/* On phones the main column dissolves so the rail's cards can sit between its sections. */}
-        <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-6">
+        <div className="contents xl:flex xl:min-w-0 xl:flex-col xl:gap-6">
           <Panel id={SECTIONS.overview} title="先了解这件事" right={overview?.label} className="order-1">
             {overview ? (
               <>
@@ -257,7 +257,7 @@ export default function StoryPage() {
               <p className="text-[13.5px] text-ink-4">还没有综述，先看下面的报道时间线。</p>
             )}
             {story.latest && (
-              <div className="-mx-5 mt-5 border-t border-line-soft px-5 pt-4 lg:-mx-6 lg:px-6">
+              <div className="mt-5 border-t border-line-soft pt-4">
                 <div className="flex items-center gap-2.5 text-[12px]">
                   <span className="font-semibold text-ink">最新进展</span>
                   {story.latestAt && <span className="num text-ink-4">{monthDayTime(story.latestAt)}</span>}
@@ -363,7 +363,7 @@ export default function StoryPage() {
           )}
         </div>
 
-        <aside className="order-2 flex min-w-0 flex-col gap-4 lg:order-none lg:gap-5">
+        <aside className="order-2 flex min-w-0 flex-col gap-4 xl:order-none xl:gap-5">
           {observed && (
             <RailCard title="为什么热">
               <p className="text-[12.5px] leading-[1.75] text-ink-3">
@@ -405,7 +405,7 @@ export default function StoryPage() {
               )}
             </RailCard>
           )}
-          <RailCard title="事件记录" className="hidden lg:block">
+          <RailCard title="事件记录" className="hidden xl:block">
             <dl className="space-y-2 text-[12.5px]">
               {story.firstReportAt && (
                 <div className="flex justify-between gap-3">

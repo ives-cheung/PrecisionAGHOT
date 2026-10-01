@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { Form, Link, useNavigation, useSearchParams } from "react-router";
 import { CATEGORY_KEYS, CATEGORY_LABELS, CHANNEL_LABELS, type CategoryKey, type ChannelKey } from "@aihot/contracts/taxonomy";
 import { IconClose, IconSearch } from "../../components/icons";
-import { PillTabs } from "../../components/ui/Tabs";
 
 /** Same page with some query parameters changed (paging state dropped). */
 export function hrefWith(base: string, params: URLSearchParams, patch: Record<string, string | null>) {
@@ -31,7 +30,23 @@ export function CategoryTabs({ base, category, channel = "all", layoutId, size =
     ...CATEGORY_KEYS.map((k) => ({ key: k, label: CATEGORY_LABELS[k], to: hrefWith(base, params, { category: k, channel: null }) })),
   ];
   const active = channel === "firstParty" ? "firstParty" : (category ?? "all");
-  return <PillTabs items={items} active={active} layoutId={layoutId} label="筛选" size={size} className={className} />;
+  return (
+    <nav id={layoutId} aria-label="筛选" className={`scrollbar-none max-w-full overflow-x-auto ${className}`}>
+      <div className="inline-flex min-w-max gap-5 border-b border-line sm:gap-6">
+        {items.map((item) => (
+          <Link
+            key={item.key}
+            to={item.to}
+            preventScrollReset
+            aria-current={item.key === active ? "page" : undefined}
+            className={`inline-flex shrink-0 items-center whitespace-nowrap border-b-2 py-3 transition-colors ${size === "sm" ? "text-[13px]" : "text-[14px]"} ${item.key === active ? "border-ink font-medium text-ink" : "border-transparent text-ink-4 hover:text-ink"}`}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
+    </nav>
+  );
 }
 
 function useSlashFocus(ref: React.RefObject<HTMLInputElement | null>) {
@@ -48,8 +63,8 @@ function useSlashFocus(ref: React.RefObject<HTMLInputElement | null>) {
 }
 
 /**
- * Search field (GET /all?q=…). Desktop ("track"): at the end of the filter row as the same grey track,
- * at the height of md tabs, with a "/" hint. Phones ("bar"): full width with a separate 搜索 button.
+ * Search field (GET /all?q=…). Desktop ("track"): a quiet outlined field at the end of the filter row,
+ * with a "/" hint. Phones ("bar"): full width with a separate 搜索 button.
  */
 export function SearchField({ action = "/all", defaultValue = "", keep = {}, variant = "track", autoFocus = false }: { action?: string; defaultValue?: string; keep?: Record<string, string | null>; variant?: "track" | "bar"; autoFocus?: boolean }) {
   const [value, setValue] = useState(defaultValue);
@@ -79,7 +94,7 @@ export function SearchField({ action = "/all", defaultValue = "", keep = {}, var
             maxLength={200}
             autoComplete="off"
             enterKeyHint="search"
-            className="h-11 w-full rounded-full border border-line-strong bg-surface pl-10 pr-9 text-[15px] text-ink outline-none transition-[border-color,box-shadow] placeholder:text-ink-4 focus:border-accent focus:shadow-[0_0_0_3px_var(--accent-soft)]"
+            className="h-12 w-full rounded-control border border-line bg-surface pl-10 pr-9 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-ink-3"
           />
           {value && (
             <button type="button" aria-label="清空" onClick={() => { setValue(""); inputRef.current?.focus(); }} className="absolute right-2.5 top-1/2 grid size-7 -translate-y-1/2 place-items-center rounded-full text-ink-4">
@@ -87,7 +102,7 @@ export function SearchField({ action = "/all", defaultValue = "", keep = {}, var
             </button>
           )}
         </label>
-        <button type="submit" className={`h-11 shrink-0 rounded-full bg-accent px-5 text-[14.5px] font-semibold text-accent-contrast transition-[background-color,transform] active:scale-[0.98] ${searching ? "opacity-60" : ""}`}>
+        <button type="submit" className={`h-12 shrink-0 rounded-control bg-accent px-5 text-[14px] font-semibold text-accent-contrast transition-[background-color,transform] active:scale-[0.98] ${searching ? "opacity-60" : ""}`}>
           搜索
         </button>
       </Form>
@@ -95,7 +110,7 @@ export function SearchField({ action = "/all", defaultValue = "", keep = {}, var
   }
 
   return (
-    <Form method="get" action={action} role="search" className="group relative w-full shrink-0 lg:w-60">
+    <Form method="get" action={action} role="search" className="group relative w-full shrink-0 lg:w-56">
       {hidden}
       <label htmlFor="site-search" className="sr-only">
         搜索标题、摘要与正文
@@ -110,7 +125,7 @@ export function SearchField({ action = "/all", defaultValue = "", keep = {}, var
         placeholder="搜索标题、摘要…"
         maxLength={200}
         autoComplete="off"
-        className="h-[42px] w-full rounded-full bg-bg-sunk pl-10 pr-10 text-[14px] text-ink outline-none ring-1 ring-inset ring-line-soft transition-[background-color,box-shadow] placeholder:text-ink-4 hover:ring-line-strong focus:bg-surface focus:shadow-[0_0_0_3px_var(--accent-soft)] focus:ring-accent dark:bg-bg-muted/60 dark:focus:bg-surface"
+        className="h-11 w-full rounded-control border border-line bg-transparent pl-10 pr-10 text-[14px] text-ink outline-none transition-colors placeholder:text-ink-4 hover:border-line-strong focus:border-ink-3"
       />
       {value ? (
         <button

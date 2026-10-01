@@ -8,7 +8,7 @@ import sharp from "sharp";
 import { SITE } from "@aihot/industry/site";
 import { config, REPO_ROOT } from "@aihot/backend/config";
 
-export const OG_TEMPLATE_VERSION = "og-2026-09-29.1";
+export const OG_TEMPLATE_VERSION = "og-precisionaghot-2026-09-30.2";
 const WIDTH = 1200;
 const HEIGHT = 630;
 const CACHE_DIR = path.join(config.dataDir, "ogcache");
@@ -50,7 +50,7 @@ export function nameMark(size: number, color: string, dot: string): Node {
 export type Node = { type: string; props: Record<string, unknown> & { style?: Record<string, unknown>; children?: unknown } };
 export const h = (type: string, style: Record<string, unknown>, children?: unknown, extra: Record<string, unknown> = {}): Node => ({ type, props: { style, children, ...extra } });
 
-const ACCENTS = { teal: "#2ce2e8", hot: "#ff7a5f", amber: "#e2b454" } as const;
+const ACCENTS = { teal: "#ececec", hot: "#d4d4d4", amber: "#a3a3a3" } as const;
 
 function clamp(text: string, max: number) {
   const chars = [...text.replace(/\s+/g, " ").trim()];
@@ -70,13 +70,12 @@ async function tree(card: OgCard): Promise<Node> {
       flexDirection: "column",
       padding: "64px 72px",
       fontFamily: "Noto Sans SC",
-      color: "#e6eded",
-      backgroundColor: "#0a1012",
-      backgroundImage: "radial-gradient(circle at 88% 8%, rgba(44,226,232,0.28), rgba(10,16,18,0) 46%), radial-gradient(circle at 0% 100%, rgba(23,107,117,0.35), rgba(10,16,18,0) 50%)",
+      color: "#ececec",
+      backgroundColor: "#171717",
     },
     [
       h("div", { display: "flex", alignItems: "center", justifyContent: "space-between" }, [
-        nameMark(34, "#e6eded", "#2ce2e8"),
+        nameMark(34, "#ececec", "#ececec"),
         h("div", { display: "flex", fontSize: 24, color: "#82939a" }, SITE_HOST),
       ]),
       h("div", { display: "flex", marginTop: 56, alignItems: "center" }, [

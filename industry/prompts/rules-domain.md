@@ -1,45 +1,32 @@
 
-【AI 领域翻译规则 — 本平台 100% 是 AI/ML/LLM 行业内容，严格遵守】
+【全球农业科技与装备翻译规则 — 严格遵守】
 
-1. 歧义默认值：以下词在中文有非 AI 歧义，**一律按 AI 含义翻译**：
-   - LLM = 大语言模型（绝不译"法学硕士"/"Master of Laws"）
-   - Token / tokens = 模型 token（保留英文；绝不译"代币"/"令牌"）
-   - Transformer = Transformer 架构（保留英文；不译"变压器"）
-   - Diffusion = 扩散模型（AI 生成，不是物理扩散）
-   - Agent / Agentic = AI 智能体 / 智能体的（不译"代理人"/"中介"）
-   - Alignment = 对齐（AI 安全语境）
-   - Inference = 推理（模型生成）
-   - Reasoning = 推理（注意：与 inference 都译"推理"，必要时用"链式推理"区分 CoT；reasoning model 指 o1/o3/R1 这类思考型模型）
-   - Embedding = 嵌入向量（也可保留英文）
-   - Distillation = 知识蒸馏
-   - Hallucination = 模型幻觉
-   - Fine-tune / Fine-tuning = 微调
-   - Pretrain / Pretraining = 预训练
-   - Context window = 上下文窗口
-   - Prompt = 提示词
-   - Skill / Skills = 技能（Claude 等 Agent 框架的能力包，不译"特长"）
+1. 根据当前材料的农业场景翻译术语，不把所有缩写都强行解释成农业或 AI 含义：
+   - Precision agriculture / Precision farming = 精准农业
+   - Auto-steering = 自动转向；Guidance = 导航；Autonomy = 自主作业。辅助驾驶、自动转向和无人自主作业不能互换
+   - GNSS = 全球导航卫星系统；RTK = 实时动态定位，保留 GNSS / RTK 缩写。定位精度、重复精度与实际作业误差分别按原文表述
+   - Variable-rate application / VRA = 变量作业；Prescription map = 处方图；Section control = 分段控制
+   - FMIS = 农场管理信息系统；FMS 在农场软件语境译为农场管理系统；ERP = 企业资源计划系统，农业场景可称农场 ERP。不能把记录台账功能扩大成自动决策能力
+   - Remote sensing = 遥感；NDVI = 归一化植被指数；IoT = 物联网；Telemetry = 遥测
+   - Fertigation = 水肥一体化；Irrigation scheduling = 灌溉调度；Spot spraying = 靶向喷洒；Drift = 飘移
+   - Field trial = 田间试验；On-farm trial = 农场试验；Demonstration = 演示或示范，不能译成已验证试验
+   - Yield = 产量；Throughput = 作业处理量或作业效率；Uptime = 正常运行时间；TCO = 总拥有成本；ROI = 投资回报；TRL = 技术成熟度
+   - AI / ML 在实际农业算法语境可译为人工智能 / 机器学习；Model 根据上下文译为算法模型、机型或型号，不能一律当成大语言模型
 
-2. 以下专有名词**一律保留英文原文**，不翻译不加中文括注：
-   - AI 公司：OpenAI / Anthropic / Google DeepMind / xAI / Meta AI / Mistral / DeepSeek / Cohere / HuggingFace（HF）/ Runway / ElevenLabs / Suno / Pika / Midjourney / Perplexity
-   - 模型族（举例 + 通用规则）：GPT / Claude / Gemini / Llama / Qwen / Grok / o 系列 / DeepSeek / Mistral / Mixtral / Phi / Sora / Veo / Imagen
-     **规则**：任何大模型族名、产品代号一律保留英文
-   - 模型版本号（举例 + 通用规则）：GPT-5 / Claude 4.7 / Claude Sonnet 4.6 / Llama 4 / Gemini 3 / o3 / o4 / DeepSeek-V4 / Qwen3.7
-     **规则**：版本号一字不改（包括字母数字后缀如 4o / 4.7 / 405B / V4 / R1），绝不"翻译性扩写"（不要把 "405B" 译成 "4050 亿"，不要把 "V4" 译成 "第 4 代"）
-   - 技术缩写（举例 + 通用规则）：LLM / RAG / RLHF / DPO / LoRA / QLoRA / PEFT / MoE / CoT / ReAct / KV cache / SOTA / AGI / MCP / ADK / NPU / GPU / TPU
-     **规则**：任何 2-5 字母的全大写缩写，默认按 AI/ML 含义保留英文
-   - 评测基准（举例 + 通用规则）：MMLU / GPQA / HumanEval / SWE-bench / SWE-bench Verified / AIME / HLE / ARC-AGI / ARC-AGI 2 / MT-Bench / Chatbot Arena / Aider Polyglot / LiveCodeBench
-     **规则**：以 -bench / -eval 结尾或全大写的评测名一律保留英文
-   - AI 工具/产品：Cursor / Copilot / Codex / Aider / Devin / Cline / Claude Code / Windsurf / Zed / v0 / Bolt / Lovable / Replit Agent
-   - Agent 框架：LangChain / LangGraph / LlamaIndex / CrewAI / AutoGen / Pydantic AI / Vercel AI SDK / DSPy
-   - 推理/部署：Ollama / vLLM / SGLang / TensorRT / Triton / CUDA / ROCm
-   - 通用技术：API / SDK / CLI / IDE / SaaS / CDN / SSO / OAuth / JWT / WebSocket / SSE / gRPC
+2. 保留厂商、设备、平台、产品、型号与协议的原名：
+   - 海外品牌与产品名没有材料明确给出的官方中文名时保留英文，例如 John Deere、AGCO、CNH、Kubota、CLAAS、PTx Trimble、Topcon、Netafim
+   - 中国厂商优先采用材料明确给出的官方中文名；不要自行创造中文品牌译名
+   - GNSS、RTK、ISOBUS、NDVI、NDRE、LiDAR、FMIS、FMS、ERP、IoT、API 等缩写保留，必要时首次出现说明中文含义
+   - 型号和版本号一字不改，包括字母数字后缀；平台兼容性、认证、数据互通和协议支持只按原文说明，不能从名称推导
 
-3. 中国厂商**优先用官方中文品牌名**（首次出现可双标"千问（Qwen3）"，后续选一种保持一致）：
-   - 千问（Qwen）/ 文心一言 / 智谱（GLM）/ 月之暗面（Kimi）/ 深度求索（DeepSeek）/ 阶跃星辰（Step）/ 零一万物（Yi）/ 百川 / 豆包（字节）/ 混元（腾讯）/ 可灵（Kling，快手）/ 即梦（Jimeng，字节）/ MiniMax（不译）/ 美团 LongCat / 昆仑万维 Skywork / 面壁 MiniCPM / 华为昇腾 / 寒武纪
+3. 数字、单位、条件与经济口径照原文保留，不进行默算换算：
+   - ha、acre、亩、L/ha、kg/ha、km/h、cm、% 等保留原单位，不擅自把英亩换成公顷或亩
+   - 节水、减药、增产、作业效率、定位精度必须保留原文的基线、对照和范围；百分比变化与百分点变化不能混淆
+   - 金额保留币种、数字、计价单位、订阅周期和适用条件；购买价格、租赁费、订阅费、服务费与每面积成本不能混用
+   - 作物、地区、季节、土壤、天气、田块面积、样本数量和作业条件只写原文明示内容；缺失时不补造
+   - 原型、实验室测试、展会演示、厂商田间试用、独立对照试验、商业交付保持原文阶段；没有明示 TRL 时不猜测等级
 
-4. 代码 / 命令 / URL / 数字单位 **一字不改**保留：
-   - 反引号代码 `code` 不翻译
-   - 命令如 /code-review、pip install、npm run 不译（不要译"代码审查"）
-   - URL 原样
-   - 数字+单位：8k context / 175B params / 3.5x speedup / $3 per M tokens / 99.9%
-   - 金额、参数量、比例、区间必须保留原文的阿拉伯数字和单位；不要把 $10B-$100B 改写成“数百亿至数千亿美元”等中文数量词
+4. 代码、命令、URL 与标识保持原样：
+   - 反引号代码、命令、数据字段、文件名不翻译
+   - URL 原样；不得添加不存在的产品入口、开放数据或购买链接
+   - 不把厂商宣称的效果译成已经被独立验证的结论，不把局部试验结果扩写成全球适用

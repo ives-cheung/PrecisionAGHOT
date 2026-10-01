@@ -5,7 +5,7 @@ import { ArticleLayout, RailSection } from "../../components/ui/Page";
 
 /**
  * Legal and policy pages, read like articles: the document on the page in one column, its facts in the
- * left rail and its outline in the right (phones get the facts above the text and no outline).
+ * right rail with its outline (smaller screens get the facts above the text).
  */
 export function CopyPage({ doc, rendered, eyebrow, footer, aside }: { doc: CopyDocument; rendered: RenderedCopy; eyebrow?: ReactNode; footer?: ReactNode; aside?: ReactNode }) {
   const facts = (["版本", "生效日期", "运营主体", "备案号"] as const).filter((k) => doc.meta[k]);
@@ -38,25 +38,20 @@ export function CopyPage({ doc, rendered, eyebrow, footer, aside }: { doc: CopyD
   );
   return (
     <ArticleLayout
-      left={
+      right={
         <>
           {aside}
           {info}
-        </>
-      }
-      right={
-        <>
-          <div className="space-y-8 2xl:hidden">{info}</div>
           {outline}
         </>
       }
     >
       <article className="pb-14 pt-5 lg:pt-2">
         {eyebrow && <div className="mb-2.5 text-[12px] font-semibold text-accent">{eyebrow}</div>}
-        <h1 className="text-[26px] font-bold leading-[1.35] text-ink lg:text-[32px] xl:text-[36px] xl:leading-[1.3]">{doc.title}</h1>
+        <h1 className="page-title">{doc.title}</h1>
         {doc.intro && <p className="mt-4 text-[15px] leading-[1.8] text-ink-3 xl:text-[16px]">{doc.intro}</p>}
         {facts.length > 0 && (
-          <dl className="mt-5 grid grid-cols-1 border-y border-line text-[12.5px] sm:grid-cols-2 lg:hidden">
+          <dl className="mt-5 grid grid-cols-1 border-y border-line text-[12.5px] sm:grid-cols-2 xl:hidden">
             {facts.map((k) => (
               <div key={k} className="flex gap-4 border-b border-line-soft py-2.5 last:border-b-0 sm:[&:nth-last-child(-n+2)]:border-b-0">
                 <dt className="w-16 shrink-0 text-ink-4">{k}</dt>

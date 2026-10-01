@@ -4,6 +4,7 @@
 // waiting behind an unreleased item leaves new snapshots at once, and snapshots answer conditional requests.
 import { config } from "@aihot/backend/config";
 import { CATEGORY_LABELS } from "@aihot/contracts/taxonomy";
+import { withSubject } from "@aihot/industry/site";
 import { beijingDate } from "@aihot/contracts/time";
 import { ogEtag } from "../apps/api/src/og/render.ts";
 import { posterEtag } from "../apps/api/src/og/poster.ts";
@@ -49,7 +50,7 @@ async function article(): Promise<string> {
     sourceId: SOURCE, url: `https://example.com/${T}-${n}`, title: `Test ${n}`, bodyText: BODY, bodyHtml: `<p>${BODY}</p>`, bodyStatus: "ok", via: "fetch", publishedAt: new Date(),
   });
   await sql`INSERT INTO analyses (article_id, input_revision, origin, relevance, category, title_zh, summary_zh, reason_zh, score, selected)
-            VALUES (${articleId}, 1, 'rule', 'pass', 'ai-models', ${`标题${n}-${T}`}, ${`SUMMARY-${n}-${T}`}, '理由', 90, true)`;
+            VALUES (${articleId}, 1, 'rule', 'pass', 'equipment', ${`标题${n}-${T}`}, ${`SUMMARY-${n}-${T}`}, '理由', 90, true)`;
   return articleId;
 }
 
@@ -122,7 +123,7 @@ test("a withdrawn item leaves every report exit", async () => {
   const id = await article();
   await publishArticle(id, released());
   const content = {
-    sections: [{ label: "模型", items: [{ itemId: id, title: `LEAD-${T}`, summary: `QUOTED-${T}`, sourceUrl: `https://example.com/original-${T}`, sourceName: "Test" }] }],
+    sections: [{ label: "农机装备", items: [{ itemId: id, title: `LEAD-${T}`, summary: `QUOTED-${T}`, sourceUrl: `https://example.com/original-${T}`, sourceName: "Test" }] }],
     flashes: [],
   };
   await sql`INSERT INTO reports (kind, key, window_start, window_end, content, generated_at, origin)
@@ -319,7 +320,7 @@ test("share images keep detail metadata and access rules while conditional reads
   const id = await article();
   await publishArticle(id, released());
   const d = JSON.parse((await get(`/api/site/items/${id}`)).body);
-  const kicker = d.category ? CATEGORY_LABELS[d.category as keyof typeof CATEGORY_LABELS] : "AI 动态";
+  const kicker = d.category ? CATEGORY_LABELS[d.category as keyof typeof CATEGORY_LABELS] : withSubject("动态");
   const source = d.source.name.replace(/（[^）]*）\s*$/, "");
   const date = beijingDate(d.timelineAt);
   const card = { kicker, title: d.title, subtitle: d.summary, meta: `${source} · ${date}`,

@@ -1,5 +1,12 @@
-AIHOT
-Copyright (c) 2026 数字生命卡兹克. The code is licensed under the MIT License (LICENSE).
+PrecisionAGHOT
+
+PrecisionAGHOT is an agriculture-focused adaptation of AIHOT:
+https://github.com/KKKKhazix/AIHOT
+Original framework author: 数字生命卡兹克 (卡哥), AI 自媒体博主.
+Copyright (c) 2026 数字生命卡兹克.
+Copyright (c) 2026 PrecisionAGHOT contributors.
+The code and this adaptation are licensed under the MIT License (LICENSE).
+Thanks to 卡哥 for creating and sharing the original framework.
 
 The name "AIHOT" and the AIHOT logo are not licensed under the MIT License. Please use your own name
 and logo for your site.

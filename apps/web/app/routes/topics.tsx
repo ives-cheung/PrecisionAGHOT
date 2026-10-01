@@ -1,3 +1,4 @@
+import { SITE } from "@aihot/industry/site";
 import { Link, useLoaderData } from "react-router";
 import { apiGet } from "../lib/api.server";
 import { pageMeta } from "../lib/seo";
@@ -11,6 +12,8 @@ interface TopicSummary {
   recent: number;
   indexable: boolean;
   latestAt: string | null;
+  allTotal: number;
+  allLatestAt: string | null;
 }
 
 export async function loader({ request }: { request: Request }) {
@@ -18,7 +21,7 @@ export async function loader({ request }: { request: Request }) {
 }
 
 export function meta() {
-  return pageMeta({ title: "主题", description: "按公司与模型、技术方向、内容形态聚合的 AI 主题页：OpenAI、Anthropic、Agent、多模态、论文与教程等 38 个方向。", path: "/topics", image: "/og/pages/topics.png" });
+  return pageMeta({ title: "主题", description: `按公司与机构、技术方向、内容形态聚合的${SITE.subject}主题页，覆盖农机装备、自动转向、智能终端、农场软件、数据平台与技术服务。`, path: "/topics", image: "/og/pages/topics.png" });
 }
 
 export function headers() {
@@ -26,45 +29,44 @@ export function headers() {
 }
 
 const GROUPS = [
-  { key: "company", name: "公司与模型", blurb: "按厂商与模型系追踪：谁发了什么、又赢了哪一局" },
-  { key: "field", name: "技术方向", blurb: "按技术领域深挖：Agent、多模态、具身智能……" },
+  { key: "company", name: "公司与机构", blurb: "追踪全球厂商与研究机构：新品发布、产业进展与合作" },
+  { key: "field", name: "技术方向", blurb: "按方向追踪：导航转向、智能作业、农场软件、数据平台与技术服务" },
   { key: "genre", name: "内容形态", blurb: "按内容类型浏览：论文、教程、观点、政策……" },
 ] as const;
 
 export default function TopicsPage() {
   const { topics } = useLoaderData<typeof loader>();
   return (
-    <div className="pb-10">
-      <header className="pb-2 pt-5 lg:pt-1">
-        <h1 className="text-[24px] font-semibold leading-[1.3] text-ink">按主题看 AI</h1>
-        <p className="mt-1.5 text-[13px] leading-relaxed text-ink-3">
-          按公司与模型、技术方向、内容形态浏览 <span className="num">{topics.length}</span> 个主题，持续汇集近期焦点与精选。
+    <div className="pb-16">
+      <header className="pb-5 pt-7 lg:pt-1">
+        <p className="eyebrow">持续追踪你关心的方向</p>
+        <h1 className="page-title mt-3">探索{SITE.subject}</h1>
+        <p className="page-lead mt-4">
+          按公司与机构、技术方向、内容形态浏览 <span className="num">{topics.length}</span> 个主题，持续汇集近期焦点与精选。
         </p>
       </header>
       {GROUPS.map((g) => (
-        <section key={g.key} aria-labelledby={`topics-${g.key}`} className="pt-8">
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-            <h2 id={`topics-${g.key}`} className="text-[15px] font-bold text-ink">
+        <section key={g.key} aria-labelledby={`topics-${g.key}`} className="pt-8 sm:pt-10">
+          <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2 border-b border-line pb-5">
+            <h2 id={`topics-${g.key}`} className="section-title">
               {g.name}
             </h2>
-            <p className="text-[12px] text-ink-4">{g.blurb}</p>
+            <p className="text-[13px] leading-relaxed text-ink-4">{g.blurb}</p>
           </div>
-          <ul className="mt-3.5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <ul className="grid gap-x-10 sm:grid-cols-2">
             {topics
               .filter((t) => t.group === g.key)
               .map((t) => (
-                <li key={t.slug}>
+                <li key={t.slug} className="border-b border-line">
                   <Link
                     to={`/topics/${t.slug}`}
                     prefetch="intent"
-                    aria-label={`查看${t.name}相关精选文章`}
-                    className="card card-hover group flex h-full flex-col px-5 py-[18px]"
+                    aria-label={`查看${t.name}相关动态与精选文章`}
+                    className="group flex h-full flex-col py-6"
                   >
-                    <span className="text-[15px] font-bold text-ink transition-colors group-hover:text-accent">{t.name}</span>
-                    <span className="mt-1.5 line-clamp-2 flex-1 text-[12.5px] leading-[1.7] text-ink-3">{t.definition}</span>
-                    <span className="mono mt-3 text-[11.5px] text-accent">
-                      查看 {t.total} 条精选 <span className="inline-block transition-transform duration-200 group-hover:translate-x-0.5">→</span>
-                    </span>
+                    <span className="flex items-start justify-between gap-5 text-[18px] font-medium leading-[1.5] text-ink"><span className="decoration-line-strong underline-offset-4 group-hover:underline">{t.name}</span><span aria-hidden="true" className="text-ink-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5">↗</span></span>
+                    <span className="mt-2.5 line-clamp-2 flex-1 text-[14px] leading-[1.8] text-ink-3">{t.definition}</span>
+                    <span className="num mt-4 text-[12px] text-ink-4">{t.allTotal ?? t.total} 条动态 · {t.total} 条精选</span>
                   </Link>
                 </li>
               ))}

@@ -1,7 +1,7 @@
-import { SITE, withSubject } from "@aihot/industry/site";
+import { SITE } from "@aihot/industry/site";
 import { Link, redirect, useLoaderData } from "react-router";
 import type { Route } from "./+types/topic";
-import type { FeedItemSummary } from "@aihot/contracts/site";
+import type { FeedItemSummary, PoolResponse } from "@aihot/contracts/site";
 import { loadOr404 } from "../lib/api.server";
 import { breadcrumbLd, pageMeta, titled } from "../lib/seo";
 import { DayList, Pagination } from "../features/feed/DayList";
@@ -13,7 +13,7 @@ export function headers() {
 }
 
 interface TopicPageData {
-  topic: { slug: string; name: string; group: string; definition: string; total: number; indexable: boolean; related: Array<{ slug: string; name: string }> };
+  topic: { slug: string; name: string; group: string; definition: string; total: number; allTotal: number; allLatestAt: string | null; indexable: boolean; related: Array<{ slug: string; name: string }> };
   items: FeedItemSummary[];
   page: number;
   pageCount: number;
@@ -25,7 +25,14 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   // Page 1 lives at the topic's own address (308).
   if (params.page === "1") throw redirect(`/topics/${params.slug}`, 308);
   const data = await loadOr404<TopicPageData>(`/api/site/topics/${encodeURIComponent(params.slug)}?page=${page}`, { signal: request.signal });
-  return { data };
+  const sources = page === 1 && data.items.length === 0
+    ? await loadOr404<PoolResponse>(`/api/site/pool?topic=${encodeURIComponent(data.topic.slug)}`, { signal: request.signal })
+    : null;
+  const recent = (sources?.items ?? [])
+    .map((item) => ({ ...item, timelineAt: item.publishedAt ?? item.timelineAt }))
+    .sort((a, b) => Date.parse(b.timelineAt) - Date.parse(a.timelineAt))
+    .slice(0, 10);
+  return { data, sources: sources ? { ...sources, items: recent } : null };
 }
 
 export function meta({ loaderData }: Route.MetaArgs) {
@@ -43,24 +50,25 @@ export function meta({ loaderData }: Route.MetaArgs) {
 }
 
 export default function TopicPage() {
-  const { data } = useLoaderData<typeof loader>();
+  const { data, sources } = useLoaderData<typeof loader>();
   const { topic, items, page, pageCount } = data;
+  const hasSources = !!sources?.items.length;
+  const allHref = `/all?topic=${encodeURIComponent(topic.slug)}`;
   const href = (p: number) => (p <= 1 ? `/topics/${topic.slug}` : `/topics/${topic.slug}/page/${p}`);
   const first = (page - 1) * 20 + 1;
   const last = first + items.length - 1;
   return (
     <div className="pb-6">
-      <header className="pb-4 pt-5 lg:pt-1">
+      <header className="mb-7 border-b border-line pb-7 pt-7 lg:pt-1">
+        <div className="mb-4"><MoreLink to="/topics">全部主题</MoreLink></div>
         <div className="flex items-start justify-between gap-4">
-          <h1 className="text-[22px] font-bold leading-[1.35] text-ink">{topic.name}</h1>
-          <span className="hidden pt-2 lg:block">
-            <MoreLink to="/topics">全部主题</MoreLink>
-          </span>
+          <h1 className="page-title">{topic.name}</h1>
         </div>
-        <p className="mt-1 max-w-[640px] text-[13px] leading-relaxed text-ink-3">{topic.definition}</p>
-        <div className="mt-3 flex flex-wrap items-baseline gap-x-5 gap-y-1">
+        <p className="page-lead mt-4">{topic.definition}</p>
+        <div className="mt-5 flex flex-wrap items-baseline gap-x-5 gap-y-3">
           <span className="text-[12.5px] text-ink-4">
-            <span className="num mr-1 text-[20px] font-bold text-ink">{topic.total.toLocaleString("zh-CN")}</span>条精选
+            <span className="num mr-1 text-[20px] font-medium text-ink">{(topic.allTotal ?? sources?.total ?? topic.total).toLocaleString("zh-CN")}</span>条动态
+            <span className="num ml-3">· {topic.total.toLocaleString("zh-CN")} 条精选</span>
           </span>
           {topic.related.length > 0 && (
             <span className="flex flex-wrap items-center gap-1.5 text-[12.5px]">
@@ -75,18 +83,26 @@ export default function TopicPage() {
         </div>
       </header>
 
-      <div className="mb-1 mt-2 flex items-baseline justify-between">
-        <h2 className="text-[18px] font-bold text-ink">最新精选</h2>
-        {items.length > 0 && (
-          <span className="num text-[12px] text-ink-4">
-            第 {first}–{last} 条 · 共 {topic.total.toLocaleString("zh-CN")} 条
-          </span>
-        )}
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
+        <h2 className="section-title">{hasSources ? "来源动态" : "最新精选"}</h2>
+        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
+          {items.length > 0 && (
+            <span className="num text-[12px] text-ink-4">
+              第 {first}–{last} 条 · 共 {topic.total.toLocaleString("zh-CN")} 条
+            </span>
+          )}
+          <Link to={allHref} className="text-[13px] text-ink-3 hover:text-ink">全部动态 ↗</Link>
+        </div>
       </div>
       {items.length === 0 ? (
-        <div className="lg:card">
-          <EmptyState title="这个主题暂时还没有精选内容" />
-        </div>
+        hasSources ? (
+          <div>
+            <p className="mt-3 text-[13px] leading-relaxed text-ink-3">这个主题暂时还没有精选，以下为已发布的来源动态，按原文日期排列。</p>
+            <DayList items={sources.items} />
+          </div>
+        ) : (
+          <EmptyState title="这个主题暂时还没有精选内容" action={<Link to={allHref} className="text-[14px] text-ink underline underline-offset-4">浏览这个主题的全部动态 ↗</Link>} />
+        )
       ) : (
         <DayList items={items} />
       )}

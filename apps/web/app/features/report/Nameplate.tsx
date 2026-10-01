@@ -15,8 +15,9 @@ const NAMEPLATES = {
 
 export function Nameplate({ which, className = "" }: { which: keyof typeof NAMEPLATES; className?: string }) {
   const n = NAMEPLATES[which];
+  const [, , width, height] = n.viewBox.split(" ").map(Number);
   return (
-    <svg viewBox={n.viewBox} className={className} aria-hidden="true" focusable="false">
+    <svg viewBox={n.viewBox} width={width} height={height} className={className} aria-hidden="true" focusable="false">
       <use href={`${n.url}#accent`} className="fill-accent" />
       <use href={`${n.url}#ink`} className="fill-ink" />
     </svg>

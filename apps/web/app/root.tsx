@@ -9,7 +9,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { Sidebar } from "./components/shell/Sidebar";
 import { MobileTabBar } from "./components/shell/MobileTabBar";
-import { BackToTop, NavigationProgress } from "./components/shell/Chrome";
+import { BackToTop, MobileHeader, NavigationProgress } from "./components/shell/Chrome";
 import { RingMark } from "./components/Logo";
 import { buttonClass } from "./components/ui/Controls";
 import { THEME_BOOT_SCRIPT } from "./lib/local-state";
@@ -44,8 +44,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf9f6" />
-        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#13191c" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#171717" />
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
         <Meta />
         <Links />
@@ -76,10 +76,12 @@ function SiteShell({ changelogVersion, children }: { changelogVersion: string | 
         跳到正文
       </a>
       <Sidebar changelogVersion={changelogVersion} />
-      {/* Mobile shell (≤ 960px): one centred column, the tab bar below. Desktop: the page fills the main area
-          up to the list width (--page-max-wide), centred beyond it. */}
-      <main id="main" className="min-w-0 flex-1 pb-[calc(72px+env(safe-area-inset-bottom))] lg:px-7 lg:pb-[72px] lg:pt-6">
-        <div className="mx-auto w-full max-w-[640px] px-4 lg:max-w-[var(--page-max-wide)] lg:px-0">{children}</div>
+      {/* Keep a readable column on both desktop and mobile. */}
+      <main id="main" className="min-w-0 flex-1 pb-[calc(80px+env(safe-area-inset-bottom))] lg:px-9 lg:pb-16 lg:pt-12 xl:px-12">
+        <div className="mx-auto w-full max-w-[720px] px-5 lg:max-w-[var(--page-max-wide)] lg:px-0">
+          <MobileHeader />
+          {children}
+        </div>
       </main>
       <MobileTabBar changelogVersion={changelogVersion} />
       <BackToTop />
@@ -117,7 +119,7 @@ export function ErrorBoundary() {
         </p>
         <div className="mt-6 flex justify-center gap-2.5">
           <Link to="/" className={buttonClass("primary")}>
-            回到精选
+            回到首页
           </Link>
           <Link to="/all" className={buttonClass("secondary")}>
             浏览全部动态

@@ -1,10 +1,11 @@
 import { SITE, withSubject } from "@aihot/industry/site";
-import { data, useLoaderData } from "react-router";
+import { data, Link, useLoaderData } from "react-router";
 import type { Route } from "./+types/report-detail";
 import type { ReportDetail, ReportNavigationEntry, ReportKind } from "@aihot/contracts/site";
 import { apiGet, loadOr404 } from "../lib/api.server";
 import { pageMeta, titled } from "../lib/seo";
 import { beijingDate } from "../lib/format";
+import { EmptyState } from "../components/ui/Page";
 import { ReportLayout } from "../features/report/ReportLayout";
 import { ReportPaper } from "../features/report/ReportPaper";
 import { KIND_LABEL, kindFromPath } from "../features/report/format";
@@ -23,7 +24,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     loadOr404<ReportDetail>(`/api/site/reports/${kind}/${key}`, { signal: request.signal }),
     apiGet<{ items: ReportNavigationEntry[] }>(`/api/site/reports/${kind}/navigation/${key}`, { signal: request.signal }),
   ]);
-  return { report, index, today: beijingDate(Date.now()) };
+  const hasContent = [...report.highlights, ...report.flashes, ...report.sections.flatMap((s) => s.items)].some((item) => item.available);
+  return { report, hasContent, index, today: beijingDate(Date.now()) };
 }
 
 export function meta({ loaderData }: Route.MetaArgs) {
@@ -43,10 +45,21 @@ export function headers() {
 }
 
 export default function ReportDetailPage() {
-  const { report, index, today } = useLoaderData<typeof loader>();
+  const { report, hasContent, index, today } = useLoaderData<typeof loader>();
   return (
     <ReportLayout kind={report.kind} index={index} current={report.key} today={today}>
-      <ReportPaper report={report} index={index} />
+      {hasContent ? <ReportPaper report={report} index={index} /> : (
+        <div>
+          <header className="border-b border-line pb-6 xl:pt-1">
+            <p className="eyebrow">行业进展，定期回顾</p>
+            <h1 className="page-title mt-3">{withSubject(KIND_LABEL[report.kind])}</h1>
+            <p className="num mt-2 text-[13px] text-ink-3">本期：{report.key}</p>
+          </header>
+          <EmptyState title="本期没有可读的精选条目" action={<Link to="/all" className="text-[13px] text-ink-3 underline underline-offset-4 hover:text-ink">查看全部动态</Link>}>
+            本期没有可供阅读的精选内容。其他日期的来源报道可在全部动态中浏览。
+          </EmptyState>
+        </div>
+      )}
     </ReportLayout>
   );
 }

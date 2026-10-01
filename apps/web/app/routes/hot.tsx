@@ -1,6 +1,6 @@
 import { SITE, withSubject } from "@aihot/industry/site";
 import { Link, useLoaderData } from "react-router";
-import type { HotEntryView, HotResponse } from "@aihot/contracts/site";
+import type { HotEntryView, HotResponse, PoolResponse } from "@aihot/contracts/site";
 import { loadOr404 } from "../lib/api.server";
 import { pageMeta } from "../lib/seo";
 import { monthDayTime, shortSourceName } from "../lib/format";
@@ -10,15 +10,25 @@ import { IconChevronDown, IconInfo } from "../components/icons";
 import { Sparkline } from "../features/hot/Sparkline";
 import { Faces } from "../features/hot/Faces";
 import { Delta } from "../features/hot/Delta";
+import { DayList } from "../features/feed/DayList";
 
 export async function loader({ request }: { request: Request }) {
-  return { hot: await loadOr404<HotResponse>("/api/site/hot", { signal: request.signal }) };
+  const hot = await loadOr404<HotResponse>("/api/site/hot", { signal: request.signal });
+  const sources = hot.entries.length === 0
+    ? await loadOr404<PoolResponse>("/api/site/pool", { signal: request.signal })
+    : null;
+  // Source reports keep their original dates; collection time must not make an archive look fresh.
+  const recent = (sources?.items ?? [])
+    .map((item) => ({ ...item, timelineAt: item.publishedAt ?? item.timelineAt }))
+    .sort((a, b) => Date.parse(b.timelineAt) - Date.parse(a.timelineAt))
+    .slice(0, 10);
+  return { hot, sources: sources ? { ...sources, items: recent } : null };
 }
 
 export function meta() {
   return pageMeta({
     title: withSubject("热点榜"),
-    description: "过去 48 小时 AI 圈讨论最多的 10 个事件：热度指数、趋势与组成热度的公开来源。",
+    description: `过去 48 小时${SITE.subject}领域至少有 2 个独立来源参与的事件，按讨论热度排序，并提供真实来源动态。`,
     path: "/hot",
     image: "/og/pages/hot.png",
   });
@@ -103,7 +113,7 @@ function HeatPanel({ e }: { e: HotEntryView }) {
 function Lead({ e }: { e: HotEntryView }) {
   const panel = !e.cover && e.spark.filter((v) => v !== null).length >= 3;
   return (
-    <article className="card card-hover group relative flex flex-col overflow-hidden p-5 sm:p-6">
+    <article className="card card-hover group relative flex flex-col overflow-hidden p-5 sm:p-7">
       <div className="flex items-center gap-2.5">
         <span className={`mono text-[12px] font-bold tracking-[0.16em] ${rankColor(e.rank)}`}>NO.{pad(e.rank)}</span>
         <Badges e={e} />
@@ -111,7 +121,7 @@ function Lead({ e }: { e: HotEntryView }) {
       </div>
       <div className={`mt-4 grid gap-5 ${e.cover || panel ? "xl:grid-cols-[minmax(0,1fr)_minmax(0,0.72fr)] xl:gap-7" : ""}`}>
         <div className="min-w-0">
-          <h2 className="text-[21px] font-bold leading-[1.4] tracking-[-0.01em] text-ink sm:text-[23px] lg:text-[25px] lg:leading-[1.38]">
+          <h2 className="text-[21px] font-semibold leading-[1.45] tracking-[-0.02em] text-ink sm:text-[24px]">
             <StoryLink e={e} className="group-hover:text-accent" />
           </h2>
           {e.summary && <p className="mt-3 line-clamp-3 text-[14px] leading-[1.75] text-ink-3">{e.summary}</p>}
@@ -154,7 +164,7 @@ function Lead({ e }: { e: HotEntryView }) {
 /** No. 2 and 3: the same card, smaller, without the picture. */
 function Runner({ e }: { e: HotEntryView }) {
   return (
-    <article className="card card-hover group relative flex flex-col px-5 py-4">
+    <article className="card card-hover group relative flex flex-col px-5 py-5">
       <div className="flex items-center gap-2.5">
         <span className={`mono text-[12px] font-bold tracking-[0.16em] ${rankColor(e.rank)}`}>NO.{pad(e.rank)}</span>
         <Badges e={e} />
@@ -222,35 +232,42 @@ function Row({ e }: { e: HotEntryView }) {
 }
 
 export default function HotPage() {
-  const { hot } = useLoaderData<typeof loader>();
+  const { hot, sources } = useLoaderData<typeof loader>();
   const [lead, ...rest] = hot.entries;
   const runners = rest.slice(0, 2);
   const others = rest.slice(2);
   return (
     <div className="pb-10">
-      <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pb-5 pt-5 lg:pt-1">
+      <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4 pb-7 pt-7 lg:pt-1">
         <div>
-          <div className="flex items-center gap-2 text-[12px] font-semibold tracking-[0.08em] text-hot">
-            <span className="relative flex size-2" aria-hidden="true">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-hot opacity-30" />
-              <span className="relative inline-flex size-2 rounded-full bg-hot" />
-            </span>
-            实时热度
-          </div>
-          <h1 className="mt-1.5 text-[24px] font-bold leading-[1.3] tracking-[-0.01em] text-ink lg:text-[26px]">{withSubject("热点榜")}</h1>
-          <p className="mt-1.5 text-[13.5px] text-ink-3">过去 {hot.windowHours} 小时，AI 圈讨论最多的 {hot.entries.length || 10} 件事</p>
+          <p className="eyebrow">多来源事件观察</p>
+          <h1 className="page-title mt-3">{withSubject("热点榜")}</h1>
+          <p className="page-lead mt-4">
+            {lead ? <>过去 {hot.windowHours} 小时，{SITE.subject}领域讨论最多的 {hot.entries.length} 件事</> : <>过去 {hot.windowHours} 小时，至少有 2 个独立来源参与的行业事件</>}
+          </p>
         </div>
         {hot.computedAt && (
           <p className="text-[12px] text-ink-4">
-            <span className="num">{monthDayTime(hot.computedAt)}</span> 更新 · 按讨论热度排序
+            <span className="num">{monthDayTime(hot.computedAt)}</span> {lead ? "更新 · 按讨论热度排序" : "检查榜单"}
           </p>
         )}
       </header>
 
       {!lead ? (
-        <div className="card rounded-sheet">
-          <EmptyState title="暂时没有热点">还没有足够多来源共同讨论的事件。</EmptyState>
-        </div>
+        <>
+          <div className="rounded-card bg-bg-sunk px-5 py-5 sm:px-6">
+            <h2 className="text-[15px] font-semibold text-ink-2">暂未出现多来源热点</h2>
+            <p className="mt-2 text-[13px] leading-relaxed text-ink-3">同一事件在过去 {hot.windowHours} 小时需至少有 2 个独立来源参与，其中至少有 1 个公开报道来源。已有报道可继续浏览。</p>
+          </div>
+          <section aria-label="最近来源动态" className="mt-9">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h2 className="section-title">最近来源动态</h2>
+              <Link to="/all" className="text-[13px] text-ink-3 hover:text-ink">全部动态{sources && sources.total > 0 ? ` · ${sources.total} 条` : ""} <span aria-hidden="true">↗</span></Link>
+            </div>
+            <p className="mb-4 mt-2 text-[13px] leading-relaxed text-ink-3">按原文发布日期排列，打开条目可查看来源摘要与原文链接。</p>
+            {sources?.items.length ? <DayList items={sources.items} /> : <EmptyState title="来源动态正在收集">采集与分析完成后，已发布的报道会出现在这里。</EmptyState>}
+          </section>
+        </>
       ) : (
         <>
           <section aria-label="热度前三" className="grid gap-3 lg:grid-cols-12 lg:gap-4">
@@ -282,7 +299,7 @@ export default function HotPage() {
         </>
       )}
 
-      <details className="disclosure group/method mt-8 text-[12px] text-ink-4">
+      <details className="disclosure group/method mt-8 border-t border-line pt-4 text-[12px] text-ink-4">
         <summary className="flex items-center gap-1.5 py-1 transition-colors hover:text-ink-2">
           <IconInfo size={15} />
           热度是怎么算的？

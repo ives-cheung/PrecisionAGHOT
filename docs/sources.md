@@ -38,6 +38,18 @@
 - `parseMode`：`html`（默认，用选择器）、`markdown`（经 Jina 渲染后按 Markdown 读）、`docusaurus_changelog`。
 - `detail`：列表缺日期、标题或摘要时抓详情页补齐（`publishedAtSelector`、`titleSelector`、`summarySelector` 等）。
 - `allowUrlPrefixes` / `denyUrlPrefixes`：只收某些路径下的文章。
+- `pagination`：直接读取的 HTML 列表可跟随下一页链接，例如 `{"nextSelector":"a[rel=next]","maxPages":5}`。`nextSelector` 指向下一页的链接，`maxPages` 是包含首页在内的页数，必须是 1–10 的整数。不配置时只读一页；Markdown/Jina 或专用适配器不接受这个配置。翻页只在首个列表页所在 origin 内进行，跳站会报错，循环链接会停止；后续页失败时整次采集失败，不会提交前面几页的半批数据。跨页按文章身份判重，保留来源日期。
+- `publishedAtUtcOffset`：无时区的来源日期按此偏移解释；点号数字日期必须按来源选择 `publishedAtFormat:"DMY"`（日/月/年，如 PTx 的 `23.03.2026`）或 `"MDY"`（月/日/年）。顶层配置用于列表，`detail.publishedAtFormat` 用于详情日期规则；非法日期不会成为发布时间，不配置则保留原有解析行为。仅有“更新月份”或最后修改时间时，不应将其冒充发布日期。
+
+### 首次导入和每轮条数
+
+`rss`、`web_list`、`json_list` 可配置 `maxItemsPerRun`：后续普通采集每轮最多存入的候选条数，默认 60，必须是 1–500 的整数。它扩大已读取列表的处理批次，不会让 RSS 自动提供更多历史，也不会代替网页的翻页配置。
+
+`maxAgeMonths` 可限制新遇到候选的历史范围，必须是 1–120 的整数，例如 `24` 表示只采集原文日期在近 24 个月内的条目（每月按 30 天计算）。它也作用于已有首次导入游标的信源；详情页补出的日期同样检查。缺少日期的条目保持原有处理方式，数据库里的旧稿不删除；不配置则不增加此限制。
+
+`requirePublishedAt:true` 要求候选在详情页补齐之后仍有可验证的发布日期；详情抓取失败、额度用完后仍缺日期的条目会跳过，避免将未注明时间的存量文章放到今天。值必须是布尔值，不配置或设为 `false` 时保留原有行为。
+
+新信源第一次导入使用 `_aihot.initialBackfillLimit`（默认 30）和 `_aihot.initialBackfillMonths`（默认 12）限制存量，同时受 `maxAgeMonths` 限制，取较近的截止日期；已有信源的首次导入游标不会因修改这两个值而重置。可在新源中使用例如 `{"maxItemsPerRun":200,"maxAgeMonths":24,"_aihot":{"initialBackfillLimit":100,"initialBackfillMonths":24}}`，并通过后台“立即抓取”读取更新后的列表。所有旧文仍保留原文日期与回灌标记，不会成为今天的新消息；扩大采集不改变精选评分门槛、模型回执或预算限制。
 
 ### x_search
 

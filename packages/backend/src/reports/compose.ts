@@ -3,7 +3,7 @@
 // the industry pack (industry/prompts/report-*.md), the sections follow its categories.
 import { z } from "zod";
 import { SITE } from "@aihot/industry/site";
-import { CATEGORIES } from "@aihot/industry/taxonomy";
+import { CATEGORIES, CATEGORY_BY_ITEM_TYPE } from "@aihot/industry/taxonomy";
 import { promptText, promptVersion } from "../editorial/prompts.ts";
 import { modelFor } from "../editorial/models.ts";
 import { addDays, beijingDate, beijingMidnight, isoWeekLabel, isoWeekRange } from "@aihot/contracts/time";
@@ -37,6 +37,8 @@ export interface ReportEntry {
 export interface Candidate extends ReportEntry {
   category: string | null;
   factKey: string;
+  /** Publication tags classify a release independently of its industry section. */
+  tags?: string[];
 }
 
 function roleOf(kind: string, firstParty: boolean): string {
@@ -52,10 +54,10 @@ export async function candidates(start: Date, end: Date): Promise<Candidate[]> {
     // gets a fresh READ COMMITTED snapshot; model calls and report writes happen after the lock ends.
     await tx`SELECT pg_advisory_xact_lock(hashtext('report_candidates'))`;
     return tx<{
-      id: string; title: string; summary: string | null; url: string; category: string | null; score: number | null; first_party: boolean;
+      id: string; title: string; summary: string | null; url: string; category: string | null; tags: string[]; score: number | null; first_party: boolean;
       source_id: string; source_name: string; source_kind: string; fact_public_id: string | null; story_public_id: string | null; at: Date; backfill: boolean;
     }[]>`
-      SELECT p.article_id AS id, p.title, p.summary, p.url, p.category, p.score, p.first_party, s.id AS source_id, s.name AS source_name,
+      SELECT p.article_id AS id, p.title, p.summary, p.url, p.category, p.tags, p.score, p.first_party, s.id AS source_id, s.name AS source_name,
              s.kind AS source_kind, f.public_id AS fact_public_id, st.public_id::text AS story_public_id, p.timeline_at AS at, p.backfill
       FROM publications p JOIN sources s ON s.id = p.source_id
       LEFT JOIN facts f ON f.id = p.fact_id LEFT JOIN stories st ON st.id = f.story_id
@@ -73,7 +75,7 @@ export async function candidates(start: Date, end: Date): Promise<Candidate[]> {
     const c: Candidate = {
       itemId: r.id, factId: r.fact_public_id, storyPublicId: r.story_public_id, title: r.title, summary: r.summary ?? "",
       sourceName: r.source_name, sourceUrl: r.url, sourceId: r.source_id, firstParty: r.first_party, role: roleOf(r.source_kind, r.first_party),
-      score: r.score === null ? null : Number(r.score), publishedAt: r.at.toISOString(), category: r.category, factKey: key,
+      score: r.score === null ? null : Number(r.score), publishedAt: r.at.toISOString(), category: r.category, factKey: key, tags: r.tags,
     };
     const prev = byFact.get(key);
     if (!prev || Number(c.firstParty) - Number(prev.firstParty) > 0 || (c.firstParty === prev.firstParty && (c.score ?? 0) > (prev.score ?? 0))) byFact.set(key, c);
@@ -151,7 +153,7 @@ export async function composeDaily(date: string, reason = "scheduled"): Promise<
   }
   const sections = SECTION_ORDER.filter((l) => perSection.get(l)?.length).map((label) => ({
     label,
-    items: perSection.get(label)!.map(({ category: _c, factKey: _f, ...entry }) => entry),
+    items: perSection.get(label)!.map(({ category: _c, factKey: _f, tags: _t, ...entry }) => entry),
   }));
   const ordered = sections.flatMap((s) => s.items).sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
   const model = await modelFor("report");
@@ -165,7 +167,9 @@ export async function composeDaily(date: string, reason = "scheduled"): Promise<
     metrics: {
       totalEvents: ordered.length,
       sourcesCount: new Set(ordered.map((e) => e.sourceId)).size,
-      modelsReleased: perSection.get("模型发布/更新")?.length ?? 0,
+      // Keep the legacy metric key for equipment releases and system/software launches or updates.
+      modelsReleased: [...perSection.values()].flat().filter((c) => c.tags?.some((tag) =>
+        tag === CATEGORY_BY_ITEM_TYPE.model_release || tag === CATEGORY_BY_ITEM_TYPE.product_launch)).length,
       firstPartyEvents: ordered.filter((e) => e.firstParty).length,
     },
     windowStart: start.toISOString(),
@@ -219,7 +223,7 @@ async function composePeriod(kind: "weekly" | "monthly", key: string, startDate:
     themes = res.data.themes.map((t) => ({
       heading: t.heading,
       summary: t.summary,
-      storyRefs: t.refs.map((r) => top[Number(r) - 1]).filter((e): e is Candidate => !!e).map(({ category: _c, factKey: _f, ...e }) => e),
+      storyRefs: t.refs.map((r) => top[Number(r) - 1]).filter((e): e is Candidate => !!e).map(({ category: _c, factKey: _f, tags: _t, ...e }) => e),
     }));
   }
   const content = {

@@ -1,208 +1,401 @@
 {
-  "$comment": "示范信源：首次启动时导入（scripts/seed.ts），已存在的不会被覆盖。之后在后台“信源”里增删改。字段说明见 docs/customize.md。",
+  "$comment": "PrecisionAGHOT 全球农业科技信源；2026-10-01 全网搜索并经项目采集器验证。新源首次最多200条、24个月历史，常规200–300条，有界网页分页。保留原始日期与独立发布机构分组，仅摘要和原文链接。已有运行库需要后台更新，seed不覆盖旧配置。",
   "sources": [
     {
-      "id": "rss-openai-news",
-      "name": "OpenAI News",
+      "id": "rss-agco-news",
+      "name": "AGCO Newsroom",
       "kind": "rss",
       "config": {
-        "feedUrl": "https://openai.com/news/rss.xml",
+        "feedUrl": "https://news.agcocorp.com/news?pagetemplate=rss",
         "_aihot": {
-          "initialBackfillLimit": 8
-        }
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
       },
       "tier": "T1",
       "first_party": true,
-      "owner_entity_id": "openai",
+      "owner_entity_id": "agco",
       "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-google-deepmind",
-      "name": "Google DeepMind",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://deepmind.google/blog/rss.xml",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "first_party": true,
-      "owner_entity_id": "google",
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-google-research",
-      "name": "Google Research",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://research.google/blog/rss/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "first_party": true,
-      "owner_entity_id": "google",
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
+      "interval_minutes": 180,
       "tags": [
         "官方",
-        "研究"
+        "农业装备",
+        "智能作业"
       ],
       "site_fulltext": false,
-      "syndicate_fulltext": false
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "signal_group_id": "agco"
     },
     {
-      "id": "rss-hugging-face",
-      "name": "Hugging Face Blog",
-      "kind": "rss",
+      "id": "web-fj-dynamics",
+      "name": "FJ Dynamics · Agriculture News",
+      "kind": "web_list",
       "config": {
-        "feedUrl": "https://huggingface.co/blog/feed.xml",
+        "url": "https://agriculture.fjdynamics.com/blog",
+        "itemSelector": "article.o_wblog_post",
+        "linkSelector": "a.o_blog_post_title",
+        "titleSelector": "a.o_blog_post_title",
+        "publishedAtSelector": "time",
+        "publishedAtUtcOffset": "+08:00",
+        "allowUrlPrefixes": [
+          "https://agriculture.fjdynamics.com/"
+        ],
         "_aihot": {
-          "initialBackfillLimit": 8
-        }
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "pagination": {
+          "nextSelector": ".pagination a:has(.fa-chevron-right)",
+          "maxPages": 5
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
       },
       "tier": "T1",
       "first_party": true,
-      "owner_entity_id": "hugging-face",
+      "owner_entity_id": "fj-dynamics",
       "participation_mode": "editorial",
-      "interval_minutes": 120,
+      "interval_minutes": 180,
       "tags": [
         "官方",
-        "开源"
+        "自动转向",
+        "农业机器人"
       ],
       "site_fulltext": false,
-      "syndicate_fulltext": false
+      "syndicate_fulltext": false,
+      "enabled": true
     },
     {
-      "id": "rss-microsoft-research",
-      "name": "Microsoft Research",
-      "kind": "rss",
+      "id": "web-chcnav-news",
+      "name": "CHCNAV · Navigation News",
+      "kind": "web_list",
       "config": {
-        "feedUrl": "https://www.microsoft.com/en-us/research/feed/",
+        "url": "https://www.chcnav.com/about/news/",
+        "itemSelector": ".f-news-list li.s-li",
+        "linkSelector": "a",
+        "titleSelector": ".s-title",
+        "publishedAtSelector": ".s-time",
+        "publishedAtUtcOffset": "+08:00",
+        "allowUrlPrefixes": [
+          "https://www.chcnav.com/about/news/20"
+        ],
         "_aihot": {
-          "initialBackfillLimit": 8
-        }
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
       },
       "tier": "T1",
       "first_party": true,
-      "owner_entity_id": "microsoft",
+      "owner_entity_id": "chcnav",
       "participation_mode": "editorial",
-      "interval_minutes": 120,
+      "interval_minutes": 180,
       "tags": [
         "官方",
-        "研究"
+        "GNSS/RTK",
+        "自动转向"
       ],
       "site_fulltext": false,
-      "syndicate_fulltext": false
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "包含测绘与定位新闻，由农业预筛拦截无关内容；只收农业应用或对农机导航有明确影响的定位服务变化。"
     },
     {
-      "id": "rss-nvidia-blog",
-      "name": "NVIDIA Blog",
-      "kind": "rss",
+      "id": "json-agrivi-blog",
+      "name": "AGRIVI · Farm Software & Advisory",
+      "kind": "json_list",
       "config": {
-        "feedUrl": "https://blogs.nvidia.com/feed/",
+        "url": "https://www.agrivi.com/blog",
+        "mode": "html_json_key",
+        "jsonKey": "posts",
+        "titlePaths": [
+          "title"
+        ],
+        "summaryPaths": [
+          "excerpt"
+        ],
+        "authorPaths": [
+          "author"
+        ],
+        "publishedAtPath": "date",
+        "urlTemplate": "https://www.agrivi.com/blog/{slug}",
+        "allowUrlPrefixes": [
+          "https://www.agrivi.com/blog/"
+        ],
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "sortByPublishedAt": true,
         "_aihot": {
-          "initialBackfillLimit": 8
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
         }
       },
       "tier": "T1",
       "first_party": true,
-      "owner_entity_id": "nvidia",
+      "owner_entity_id": "agrivi",
       "participation_mode": "editorial",
-      "interval_minutes": 120,
+      "interval_minutes": 180,
       "tags": [
-        "官方"
+        "官方",
+        "农场软件",
+        "农艺决策",
+        "数据互通"
       ],
       "site_fulltext": false,
-      "syndicate_fulltext": false
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "signal_group_id": "agrivi",
+      "$comment": "旧 WordPress RSS 已在 Next.js 迁站后 404，改用官网原生公开 JSON post 列表；date 与详情原 JSON-LD datePublished 一致，不使用迁站 dateModified。原 source kind 不可 update，需新 ID 并停用旧 RSS。"
     },
     {
-      "id": "rss-aws-ml",
-      "name": "AWS Machine Learning Blog",
-      "kind": "rss",
+      "id": "web-agworld-blog",
+      "name": "Agworld · Farm Data & Agronomy",
+      "kind": "web_list",
       "config": {
-        "feedUrl": "https://aws.amazon.com/blogs/machine-learning/feed/",
+        "url": "https://www.agworld.com/au/resources/blog/",
+        "itemSelector": "article",
+        "linkSelector": "a:has(h3)",
+        "titleSelector": "h3",
+        "publishedAtSelector": "span.inline-block",
+        "publishedAtUtcOffset": "+08:00",
+        "allowUrlPrefixes": [
+          "https://www.agworld.com/au/resources/blog/"
+        ],
+        "sortByPublishedAt": true,
         "_aihot": {
-          "initialBackfillLimit": 8
-        }
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
       },
       "tier": "T1",
       "first_party": true,
+      "owner_entity_id": "agworld",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农场软件",
+        "农业服务",
+        "数字化运营"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "signal_group_id": "semios-group"
+    },
+    {
+      "id": "web-farmerp-blog",
+      "name": "FarmERP · Farm Enterprise Software",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.farmerp.com/blogs/",
+        "itemSelector": ".elementskit-post-image-card",
+        "linkSelector": ".entry-title a",
+        "titleSelector": ".entry-title",
+        "publishedAtSelector": ".meta-date-text",
+        "publishedAtUtcOffset": "+05:30",
+        "allowUrlPrefixes": [
+          "https://www.farmerp.com/blog/"
+        ],
+        "detail": {
+          "maxFetches": 30,
+          "titleSelector": "h1",
+          "titleAuthoritative": true
+        },
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "pagination": {
+          "nextSelector": "a.next.page-numbers",
+          "maxPages": 5
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "farmerp",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农场ERP",
+        "农场软件",
+        "数字化运营"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-eosda-blog",
+      "name": "EOSDA · Agriculture Data & Services",
+      "kind": "web_list",
+      "config": {
+        "url": "https://eos.com/blog/",
+        "itemSelector": ".card-blog",
+        "linkSelector": "a.card-link",
+        "titleSelector": "h2",
+        "publishedAtSelector": "time[datetime]",
+        "allowUrlPrefixes": [
+          "https://eos.com/blog/"
+        ],
+        "sortByPublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "eosda",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "遥感",
+        "农业服务",
+        "农艺决策"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "包含非农业遥感文章，由农业预筛拦截；保留农业遥感与相关数据服务。"
+    },
+    {
+      "id": "rss-usda-ars",
+      "name": "USDA ARS · Research News",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.ars.usda.gov/rss/?productName=Research%20News",
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "usda",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "研究",
+        "田间试验"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "综合农业研究源，预筛保留农业装备、数字农业、传感与农艺决策相关成果。"
+    },
+    {
+      "id": "rss-future-farming",
+      "name": "Future Farming",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.futurefarming.com/feed/",
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
       "owner_entity_id": null,
       "participation_mode": "editorial",
       "interval_minutes": 120,
       "tags": [
-        "官方",
-        "教程"
+        "媒体",
+        "全球农业科技",
+        "农业装备",
+        "农业机器人",
+        "无人机",
+        "水肥管理"
       ],
       "site_fulltext": false,
-      "syndicate_fulltext": false
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "signal_group_id": "misset"
     },
     {
-      "id": "rss-github-ai",
-      "name": "GitHub Blog · AI & ML",
+      "id": "rss-agfundernews",
+      "name": "AgFunderNews",
       "kind": "rss",
       "config": {
-        "feedUrl": "https://github.blog/ai-and-ml/feed/",
+        "feedUrl": "https://agfundernews.com/feed",
         "_aihot": {
-          "initialBackfillLimit": 8
-        }
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
       },
-      "tier": "T1",
-      "first_party": true,
+      "tier": "T2",
+      "first_party": false,
       "owner_entity_id": null,
       "participation_mode": "editorial",
       "interval_minutes": 120,
       "tags": [
-        "官方"
+        "媒体",
+        "产业动态",
+        "农业服务",
+        "农场软件"
       ],
       "site_fulltext": false,
-      "syndicate_fulltext": false
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "覆盖农业与食品科技，预筛拦截无生产环节关联的消费食品和餐饮新闻。"
     },
     {
-      "id": "rss-mistral",
-      "name": "Mistral AI",
-      "kind": "rss",
+      "id": "web-ptx-articles",
+      "name": "PTx · Precision Agriculture Articles",
+      "kind": "web_list",
       "config": {
-        "feedUrl": "https://mistral.ai/rss.xml",
+        "url": "https://www.ptxag.com/us/en/resources/articles",
+        "itemSelector": "article.blog-grid__article",
+        "linkSelector": ".blog-grid__article-title a",
+        "titleSelector": ".blog-grid__article-title",
+        "allowUrlPrefixes": [
+          "https://www.ptxag.com/us/en/resources/articles/"
+        ],
         "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "first_party": true,
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-bair",
-      "name": "Berkeley AI Research",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://bair.berkeley.edu/blog/feed.xml",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "publishedAtSelector": ".blog-grid__article-publish-date",
+        "publishedAtUtcOffset": "+00:00",
+        "sortByPublishedAt": true,
+        "pagination": {
+          "nextSelector": "a.blog-grid__page-links-next",
+          "maxPages": 8
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "publishedAtFormat": "DMY"
       },
       "tier": "T1",
       "first_party": true,
@@ -210,83 +403,67 @@
       "participation_mode": "editorial",
       "interval_minutes": 180,
       "tags": [
-        "研究"
+        "官方",
+        "自动转向",
+        "作业终端",
+        "变量作业",
+        "农场软件"
       ],
       "site_fulltext": false,
-      "syndicate_fulltext": false
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "官方列表9篇/页，可翻8页；日期明确为DD.MM.YYYY，采集器按日/月/年解析，保留来源日期，已验证后启用。",
+      "signal_group_id": "agco"
     },
     {
-      "id": "rss-the-verge-ai",
-      "name": "The Verge · AI",
-      "kind": "rss",
+      "id": "web-farmbrite-updates",
+      "name": "Farmbrite · Product Updates",
+      "kind": "web_list",
       "config": {
-        "feedUrl": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+        "url": "https://help.farmbrite.com/help/whatsnew",
+        "itemSelector": ".faq-nav-content .article-block",
+        "linkSelector": "a",
+        "titleSelector": "a",
+        "allowUrlPrefixes": [
+          "https://help.farmbrite.com/help/whats-new"
+        ],
+        "detail": {
+          "maxFetches": 8,
+          "titleSelector": "h1",
+          "titleAuthoritative": true
+        },
         "_aihot": {
           "initialBackfillLimit": 8
         }
       },
-      "tier": "T2",
-      "first_party": false,
-      "owner_entity_id": null,
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "farmbrite",
       "participation_mode": "editorial",
-      "interval_minutes": 60,
+      "interval_minutes": 180,
       "tags": [
-        "媒体"
+        "官方",
+        "农场软件",
+        "数字化运营"
       ],
       "site_fulltext": false,
-      "syndicate_fulltext": false
+      "syndicate_fulltext": false,
+      "enabled": false,
+      "$comment": "列表已验证40条产品月度更新。详情只有最后修改时间，未提供可验证发布日期；默认禁用，完成日期策略后再启用。"
     },
     {
-      "id": "rss-techcrunch-ai",
-      "name": "TechCrunch · AI",
+      "id": "rss-global-agtech",
+      "name": "Global Ag Tech Initiative",
       "kind": "rss",
       "config": {
-        "feedUrl": "https://techcrunch.com/category/artificial-intelligence/feed/",
+        "feedUrl": "https://www.globalagtechinitiative.com/feed/",
+        "maxItemsPerRun": 300,
         "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T2",
-      "first_party": false,
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 60,
-      "tags": [
-        "媒体"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-ars-technica-ai",
-      "name": "Ars Technica · AI",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://arstechnica.com/ai/feed/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T2",
-      "first_party": false,
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 60,
-      "tags": [
-        "媒体"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-mit-tech-review-ai",
-      "name": "MIT Technology Review · AI",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://www.technologyreview.com/topic/artificial-intelligence/feed",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
       },
       "tier": "T2",
       "first_party": false,
@@ -294,41 +471,30 @@
       "participation_mode": "editorial",
       "interval_minutes": 120,
       "tags": [
-        "媒体"
+        "媒体",
+        "全球农业科技",
+        "农场软件",
+        "农业机器人",
+        "数据互通"
       ],
       "site_fulltext": false,
-      "syndicate_fulltext": false
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "signal_group_id": "meister-media"
     },
     {
-      "id": "rss-the-decoder",
-      "name": "The Decoder",
+      "id": "rss-abg-agtech",
+      "name": "AgriBusiness Global · Agtech",
       "kind": "rss",
       "config": {
-        "feedUrl": "https://the-decoder.com/feed/",
+        "feedUrl": "https://www.agribusinessglobal.com/agtech/feed/",
+        "maxItemsPerRun": 300,
         "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T2",
-      "first_party": false,
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 60,
-      "tags": [
-        "媒体"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-simon-willison",
-      "name": "Simon Willison",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://simonwillison.net/atom/everything/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
       },
       "tier": "T2",
       "first_party": false,
@@ -336,53 +502,2059 @@
       "participation_mode": "editorial",
       "interval_minutes": 120,
       "tags": [
-        "个人"
+        "媒体",
+        "产业动态",
+        "农业机器人",
+        "无人机",
+        "农场软件"
       ],
       "site_fulltext": false,
-      "syndicate_fulltext": false
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "signal_group_id": "meister-media"
     },
     {
-      "id": "rss-import-ai",
-      "name": "Import AI",
+      "id": "rss-farmers-guide-precision",
+      "name": "Farmers Guide · Precision Farming",
       "kind": "rss",
       "config": {
-        "feedUrl": "https://importai.substack.com/feed",
+        "feedUrl": "https://www.farmersguide.co.uk/machinery/precision-farming/feed/",
+        "maxItemsPerRun": 300,
         "_aihot": {
-          "initialBackfillLimit": 8
-        }
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
       },
       "tier": "T2",
       "first_party": false,
       "owner_entity_id": null,
       "participation_mode": "editorial",
-      "interval_minutes": 180,
+      "interval_minutes": 120,
       "tags": [
-        "个人",
-        "周刊"
+        "媒体",
+        "GNSS/RTK",
+        "自动转向",
+        "变量作业",
+        "农业服务"
       ],
       "site_fulltext": false,
-      "syndicate_fulltext": false
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "signal_group_id": "farmers-guide"
     },
     {
-      "id": "rss-latent-space",
-      "name": "Latent Space",
+      "id": "rss-farmers-guide-farm-tech",
+      "name": "Farmers Guide · Farm Tech",
       "kind": "rss",
       "config": {
-        "feedUrl": "https://www.latent.space/feed",
+        "feedUrl": "https://www.farmersguide.co.uk/business/farm-tech/feed/",
+        "maxItemsPerRun": 300,
         "_aihot": {
-          "initialBackfillLimit": 8
-        }
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
       },
       "tier": "T2",
       "first_party": false,
       "owner_entity_id": null,
       "participation_mode": "editorial",
-      "interval_minutes": 180,
+      "interval_minutes": 120,
       "tags": [
-        "个人"
+        "媒体",
+        "农场软件",
+        "数字化运营",
+        "无人机",
+        "农业服务"
       ],
       "site_fulltext": false,
-      "syndicate_fulltext": false
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "signal_group_id": "farmers-guide"
+    },
+    {
+      "id": "rss-agritech-nz",
+      "name": "AgriTech New Zealand",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://agritechnz.org.nz/feed/",
+        "maxItemsPerRun": 300,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 120,
+      "tags": [
+        "官方",
+        "产业动态",
+        "农业服务",
+        "农场软件"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "新西兰农业科技会员协会官方动态，包含生态与产业服务信息；预筛拦截泛人事福利等无关内容。"
+    },
+    {
+      "id": "rss-farmers-guide-machinery",
+      "name": "Farmers Guide · Machinery",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.farmersguide.co.uk/machinery/feed/",
+        "maxItemsPerRun": 300,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 120,
+      "tags": [
+        "媒体",
+        "农业装备",
+        "智能作业",
+        "农业服务"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "农机分类覆盖新品、经销和装备应用，预筛拦截慈善活动与普通安全广告。",
+      "signal_group_id": "farmers-guide"
+    },
+    {
+      "id": "rss-agritech-uk-news",
+      "name": "Agritech UK · News",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.agritech-uk.org/category/news/feed/",
+        "maxItemsPerRun": 300,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 120,
+      "tags": [
+        "官方",
+        "产业动态",
+        "全球农业科技",
+        "农业装备"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "英国农业科技目录与产业组织官方新闻；综合农业新闻由农业科技预筛判断关联。"
+    },
+    {
+      "id": "web-cropx-news",
+      "name": "CropX · Product & Company News",
+      "kind": "web_list",
+      "config": {
+        "url": "https://cropx.com/customer-case-studies/news/",
+        "itemSelector": "article.elementor-post",
+        "linkSelector": ".elementor-post__title a",
+        "titleSelector": ".elementor-post__title",
+        "publishedAtSelector": ".elementor-post-date",
+        "publishedAtUtcOffset": "+00:00",
+        "allowUrlPrefixes": [
+          "https://cropx.com/20"
+        ],
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农场软件",
+        "智慧灌溉",
+        "农艺决策"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "signal_group_id": "cropx"
+    },
+    {
+      "id": "web-cropx-blog",
+      "name": "CropX · Agronomy Insights",
+      "kind": "web_list",
+      "config": {
+        "url": "https://cropx.com/blog/",
+        "itemSelector": "article.elementor-post",
+        "linkSelector": ".elementor-post__title a",
+        "titleSelector": ".elementor-post__title",
+        "publishedAtSelector": ".elementor-post-date",
+        "publishedAtUtcOffset": "+00:00",
+        "allowUrlPrefixes": [
+          "https://cropx.com/20"
+        ],
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农艺决策",
+        "土壤",
+        "智慧灌溉"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "signal_group_id": "cropx"
+    },
+    {
+      "id": "web-bushel-blog",
+      "name": "Bushel · Farm Software & Services",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.bushelpowered.com/blog",
+        "itemSelector": ".collection-item-3",
+        "linkSelector": "a[href^=\"/blog/\"]",
+        "titleSelector": "h3,h1",
+        "publishedAtSelector": ".blog3_date-wrapper",
+        "publishedAtUtcOffset": "-05:00",
+        "allowUrlPrefixes": [
+          "https://www.bushelpowered.com/blog/"
+        ],
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "pagination": {
+          "nextSelector": "a.w-pagination-next",
+          "maxPages": 5
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农场软件",
+        "农业服务",
+        "数字化运营"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-xfarm-blog",
+      "name": "xFarm Technologies · Digital Agriculture",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.xfarm.ag/en/blog",
+        "itemSelector": ".evidence-blog-post-container",
+        "linkSelector": "a[href*=\"/en/blog-posts/\"]",
+        "titleSelector": ".blog-post-name",
+        "allowUrlPrefixes": [
+          "https://www.xfarm.ag/en/blog-posts/"
+        ],
+        "detail": {
+          "maxFetches": 100,
+          "publishedAtSelector": "div:has(> h1.post-title) > div:first-child",
+          "publishedAtUtcOffset": "+02:00",
+          "publishedAtAuthoritative": true,
+          "titleSelector": "h1.post-title",
+          "titleAuthoritative": true
+        },
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农场软件",
+        "数据互通",
+        "农业服务",
+        "自动转向"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-bonsai-news",
+      "name": "Bonsai Robotics · Autonomy Articles",
+      "kind": "web_list",
+      "config": {
+        "url": "https://bonsairobotics.ai/news/",
+        "itemSelector": "a.news-card[href^=\"/news/\"]",
+        "linkSelector": "a.news-card",
+        "titleSelector": ".news-card__title",
+        "publishedAtSelector": ".news-card__date-tag",
+        "publishedAtUtcOffset": "-07:00",
+        "allowUrlPrefixes": [
+          "https://bonsairobotics.ai/news/"
+        ],
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农业机器人",
+        "无人作业",
+        "农业AI"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-fieldbee-blog",
+      "name": "FieldBee · Guidance & Farm Software",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.fieldbee.com/blog",
+        "itemSelector": "div.shadow-custom:has([class*=\"blog-post-card_title\"])",
+        "linkSelector": "[class*=\"blog-post-card_title\"] a",
+        "titleSelector": "[class*=\"blog-post-card_title\"]",
+        "publishedAtSelector": "div.mb-1.text-sm.uppercase",
+        "publishedAtUtcOffset": "+02:00",
+        "allowUrlPrefixes": [
+          "https://www.fieldbee.com/blog/"
+        ],
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "pagination": {
+          "nextSelector": "a[href^=\"/blog/page/\"]:contains(\">>\")",
+          "maxPages": 5
+        },
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "自动转向",
+        "GNSS/RTK",
+        "农场软件"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "rss-taranis-blog",
+      "name": "Taranis · Crop Intelligence",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.taranis.com/feed/",
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "taranis",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农业AI",
+        "遥感",
+        "农艺决策"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "已使用项目 guardedFetch 和 RSS 解析器验证。RSS当前返回10条，配置上限不会扩大上游RSS历史条数。"
+    },
+    {
+      "id": "rss-farmdroid-blog",
+      "name": "FarmDroid · Robotics Field Insights",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://farmdroid.com/feed/",
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "farmdroid",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农业机器人",
+        "GNSS/RTK",
+        "无人作业"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "已使用项目 guardedFetch 和 RSS 解析器验证。RSS当前返回10条，配置上限不会扩大上游RSS历史条数。"
+    },
+    {
+      "id": "rss-agxeed-news",
+      "name": "AgXeed · Autonomous Farming",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.agxeed.com/feed/",
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "agxeed",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农业机器人",
+        "无人作业",
+        "农业装备"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "已使用项目 guardedFetch 和 RSS 解析器验证。RSS当前返回10条，配置上限不会扩大上游RSS历史条数。"
+    },
+    {
+      "id": "rss-sentera-news",
+      "name": "Sentera · Aerial Crop Intelligence",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://sentera.com/feed/",
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "john-deere",
+      "signal_group_id": "john-deere",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "无人机",
+        "遥感",
+        "变量作业"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "已使用项目 guardedFetch 和 RSS 解析器验证。RSS当前返回10条，配置上限不会扩大上游RSS历史条数。"
+    },
+    {
+      "id": "web-xag-news",
+      "name": "XAG · Official Agriculture News",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.xa.com/en/news/official",
+        "itemSelector": ".info-news-li",
+        "linkSelector": "a",
+        "titleSelector": ".info-news-title",
+        "publishedAtSelector": ".info-time",
+        "publishedAtUtcOffset": "+08:00",
+        "allowUrlPrefixes": [
+          "https://www.xa.com/en/news/official/"
+        ],
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "xag",
+      "signal_group_id": "xag",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "无人机",
+        "农业机器人",
+        "无人作业"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "已使用项目 guardedFetch 与 fetchWebList 验证真实标题、原文链接和发布日期。未配置未经验证的翻页。"
+    },
+    {
+      "id": "web-ecorobotix-news",
+      "name": "Ecorobotix · Precision Spraying",
+      "kind": "web_list",
+      "config": {
+        "url": "https://ecorobotix.com/news-events/",
+        "itemSelector": ".b-listing__posts-container article.c-post-card",
+        "linkSelector": "a.c-post-card__link",
+        "titleSelector": ".c-post-card__heading",
+        "publishedAtSelector": "time.c-post-card__date",
+        "publishedAtUtcOffset": "+02:00",
+        "allowUrlPrefixes": [
+          "https://ecorobotix.com/blog/"
+        ],
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "ecorobotix",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "变量作业",
+        "植保",
+        "农业AI"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "已使用项目 guardedFetch 与 fetchWebList 验证真实标题、原文链接和发布日期。未配置未经验证的翻页。"
+    },
+    {
+      "id": "web-singularxyz-news",
+      "name": "SingularXYZ · Precision Navigation",
+      "kind": "web_list",
+      "config": {
+        "url": "https://singularxyz.com/news/1?page=1",
+        "itemSelector": "a.newsitem",
+        "linkSelector": "a.newsitem",
+        "titleSelector": ".h1",
+        "publishedAtSelector": ".time",
+        "publishedAtUtcOffset": "+08:00",
+        "allowUrlPrefixes": [
+          "https://singularxyz.com/news_detail/"
+        ],
+        "pagination": {
+          "nextSelector": "a.page_next",
+          "maxPages": 10
+        },
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "singularxyz",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "GNSS/RTK",
+        "自动转向",
+        "ISOBUS"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "已使用项目 guardedFetch 与 fetchWebList 验证真实标题、原文链接和发布日期。有界分页已实际完整读取。"
+    },
+    {
+      "id": "web-semios-blog",
+      "name": "Semios · Sensors, Water & Farm Data",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.semios.com/resources/blog/",
+        "itemSelector": "article",
+        "linkSelector": "a:has(h3)",
+        "titleSelector": "h3",
+        "publishedAtSelector": "span.inline-block",
+        "publishedAtUtcOffset": "-07:00",
+        "allowUrlPrefixes": [
+          "https://www.semios.com/resources/blog/"
+        ],
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "semios-group",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "传感器物联网",
+        "智慧灌溉",
+        "农场软件"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "已使用项目 guardedFetch 与 fetchWebList 验证真实标题、原文链接和发布日期。未配置未经验证的翻页。"
+    },
+    {
+      "id": "rss-hitarget-news",
+      "name": "Hi-Target · Navigation & Smart Agriculture",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.hi-target.com.cn/news/feed",
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "hi-target",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "GNSS/RTK",
+        "自动转向",
+        "农场软件"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "已使用项目 guardedFetch 和 RSS 解析器验证。RSS当前返回10条，配置上限不会扩大上游RSS历史条数。"
+    },
+    {
+      "id": "rss-agnavigator",
+      "name": "AgNavigator · Global AgTech",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.agtechnavigator.com/arc/outboundfeeds/rss/",
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "signal_group_id": "william-reed",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "农业科技",
+        "农业数据",
+        "农业机器人"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "rss-agri-pulse-technology",
+      "name": "Agri-Pulse · Technology",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.agri-pulse.com/rss/topic/21693-technology",
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "signal_group_id": "agri-pulse",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "农业科技",
+        "政策",
+        "技术服务"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "rss-agritecture",
+      "name": "Agritecture · Controlled Environment Agriculture",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.agritecture.com/blog/rss.xml",
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "agritecture",
+      "signal_group_id": "agritecture",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "设施农业",
+        "水肥管理",
+        "技术服务"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "rss-farmers-weekly-sa-machinery",
+      "name": "Farmer’s Weekly South Africa · Machinery & Equipment",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.farmersweekly.co.za/agri-technology/machinery-and-equipment/feed/",
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "signal_group_id": "caxton-farmers-weekly",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "农业装备",
+        "水肥管理",
+        "智能作业"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "rss-farmers-review-africa-technology",
+      "name": "Farmers Review Africa · Technology",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://farmersreviewafrica.com/category/technology/feed/",
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "signal_group_id": "farmers-review-africa",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "农业科技",
+        "农业机器人",
+        "农业数据"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "rss-farmers-review-africa-machinery",
+      "name": "Farmers Review Africa · Machinery",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://farmersreviewafrica.com/category/machinery/feed/",
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "signal_group_id": "farmers-review-africa",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "农业装备",
+        "智能作业",
+        "农业机器人"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-spaa-news",
+      "name": "SPAA · Australian Precision Agriculture News",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.spaa.com.au/news-spaa/latest-news/",
+        "itemSelector": ".news-item-wrapper",
+        "linkSelector": "a.news-page-open",
+        "titleSelector": "h3.panel-title",
+        "publishedAtSelector": ".news-date",
+        "publishedAtUtcOffset": "+10:00",
+        "allowUrlPrefixes": [
+          "https://www.spaa.com.au/news-item/"
+        ],
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "spaa",
+      "signal_group_id": "spaa",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "精准农业",
+        "农业装备",
+        "变量作业"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-aef-news",
+      "name": "AEF · ISOBUS & Agricultural Interoperability",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.aef-online.org/aef-news.html",
+        "itemSelector": ".news-list-item-single",
+        "linkSelector": "a[href]",
+        "titleSelector": "h3",
+        "publishedAtSelector": "time",
+        "allowUrlPrefixes": [
+          "https://www.aef-online.org/aef-news/"
+        ],
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "aef",
+      "signal_group_id": "aef",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "ISOBUS",
+        "农业数据",
+        "智能作业"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-uk-agritech-centre",
+      "name": "UK Agri-Tech Centre · News & Insights",
+      "kind": "web_list",
+      "config": {
+        "url": "https://ukagritechcentre.com/news/",
+        "itemSelector": "article.elementor-post",
+        "linkSelector": "h3 a",
+        "titleSelector": "h3 a",
+        "publishedAtSelector": ".elementor-post-date",
+        "publishedAtUtcOffset": "+01:00",
+        "allowUrlPrefixes": [
+          "https://ukagritechcentre.com/news/"
+        ],
+        "pagination": {
+          "nextSelector": ".page-numbers.current + a.page-numbers",
+          "maxPages": 10
+        },
+        "detail": {
+          "maxFetches": 200,
+          "upgradeDatePrecision": true
+        },
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "uk-agritech-centre",
+      "signal_group_id": "uk-agritech-centre",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "农业科技",
+        "农业机器人",
+        "技术服务"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "rss-hackatagro",
+      "name": "HackatAgro · Radar",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://hackatagro.com/feed.xml",
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T2",
+      "first_party": false,
+      "signal_group_id": "hackatagro",
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "农业科技"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "rss-maquinac",
+      "name": "Maquinac · Agricultural Machinery",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://maquinac.com/feed/",
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T2",
+      "first_party": false,
+      "signal_group_id": "maquinac",
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "农业科技"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "rss-sencrop-blog",
+      "name": "Sencrop · Ag Weather & Sensors",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://uk.blog.sencrop.com/rss/",
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "isagri",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "传感器物联网",
+        "智慧灌溉",
+        "农艺决策"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "通过项目guardedFetch及RSS解析器验证原日期、标题和原文HTTP200；上游当前RSS仅提供15条。"
+    },
+    {
+      "id": "rss-metos-news",
+      "name": "METOS by Pessl Instruments · Sensors & Farm Data",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://metos.global/en/feed/",
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "pessl-instruments",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "传感器物联网",
+        "农场软件",
+        "数据互通"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "通过项目guardedFetch及RSS解析器验证原日期、标题和原文HTTP200；上游当前RSS仅提供10条。"
+    },
+    {
+      "id": "rss-farmbot-monitoring",
+      "name": "Farmbot · Remote Monitoring Solutions",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://farmbot.com.au/feed/",
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "farmbot-monitoring",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "传感器物联网",
+        "智慧灌溉",
+        "农业技术服务"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "通过项目guardedFetch及RSS解析器验证原日期、标题和原文HTTP200；上游当前RSS仅提供12条。"
+    },
+    {
+      "id": "rss-cropin-blog",
+      "name": "Cropin · Agriculture Cloud & Intelligence",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.cropin.com/feed/",
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "cropin",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农场软件",
+        "农场ERP",
+        "遥感",
+        "农业AI"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "通过项目guardedFetch及RSS解析器验证原日期、标题和原文HTTP200；上游当前RSS仅提供12条。"
+    },
+    {
+      "id": "rss-acclym-blog",
+      "name": "Acclym (Agritask) · Agriculture Data Platform",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.acclym.com/feed/",
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "cropx",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农场软件",
+        "农艺决策",
+        "数据互通"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "通过项目guardedFetch及RSS解析器验证原日期、标题和原文HTTP200；上游当前RSS仅提供10条。"
+    },
+    {
+      "id": "web-verdant-news",
+      "name": "Verdant Robotics · Precision Application & Autonomy",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.verdantrobotics.com/news-events",
+        "itemSelector": "a.card-main_component[href^=\"/news/\"]",
+        "linkSelector": "a.card-main_component",
+        "titleSelector": "h3,h2",
+        "detail": {
+          "maxFetches": 200,
+          "titleSelector": "h1",
+          "titleAuthoritative": true
+        },
+        "allowUrlPrefixes": [
+          "https://www.verdantrobotics.com/news/"
+        ],
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "verdant-robotics",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农业机器人",
+        "无人作业",
+        "变量作业"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "通过项目guardedFetch及网页列表/详情解析器验证原日期、标题和原文HTTP200；不配置未经验证的翻页。"
+    },
+    {
+      "id": "web-raven-news",
+      "name": "Raven · Precision Ag Technology",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.ravenind.com/resources/news",
+        "itemSelector": "article.news-list-article",
+        "linkSelector": "a.callout-link",
+        "titleSelector": "h2",
+        "allowUrlPrefixes": [
+          "https://www.ravenind.com/resources/news/"
+        ],
+        "pagination": {
+          "nextSelector": ".pagination li.next a",
+          "maxPages": 10
+        },
+        "detail": {
+          "maxFetches": 200
+        },
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "cnh",
+      "signal_group_id": "cnh",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "自动转向",
+        "变量作业",
+        "农场软件"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "通过项目guardedFetch及网页列表/详情解析器验证原日期、标题和原文HTTP200；已完整读取有界10页。"
+    },
+    {
+      "id": "web-sunnav-official-news",
+      "name": "SunNav · Official Smart Agriculture News",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.sunnavtech.com/News.aspx",
+        "itemSelector": ".news-con .item",
+        "linkSelector": ".more a",
+        "titleSelector": "h1",
+        "publishedAtSelector": ".date",
+        "publishedAtUtcOffset": "+08:00",
+        "allowUrlPrefixes": [
+          "https://www.sunnavtech.com/NewsDetail.aspx"
+        ],
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "sunnav",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "GNSS/RTK",
+        "自动转向",
+        "无人作业"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "通过项目guardedFetch及网页列表/详情解析器验证原日期、标题和原文HTTP200；不配置未经验证的翻页。"
+    },
+    {
+      "id": "web-comnav-news",
+      "name": "ComNav / SinoGNSS · Precision Navigation",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.comnavtech.com/News_details/",
+        "itemSelector": "li:has(.item-text)",
+        "linkSelector": "a",
+        "titleSelector": ".title",
+        "publishedAtSelector": ".date",
+        "publishedAtUtcOffset": "+08:00",
+        "allowUrlPrefixes": [
+          "https://www.comnavtech.com/News_details/"
+        ],
+        "pagination": {
+          "nextSelector": "a.next",
+          "maxPages": 8
+        },
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "comnav",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "GNSS/RTK",
+        "自动转向",
+        "ISOBUS"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "通过项目guardedFetch及网页列表/详情解析器验证原日期、标题和原文HTTP200；已完整读取配置中的有界分页。"
+    },
+    {
+      "id": "json-dji-agriculture-cn",
+      "name": "DJI Agriculture · Official China Newsroom",
+      "kind": "json_list",
+      "config": {
+        "url": "https://ag.dji.com/cn/newsroom",
+        "mode": "html_json_key",
+        "jsonKey": "news_reports",
+        "titlePaths": [
+          "title"
+        ],
+        "summaryPaths": [
+          "excerpt"
+        ],
+        "authorPaths": [
+          "author"
+        ],
+        "publishedAtPath": "published_at",
+        "urlTemplate": "https://ag.dji.com/cn/newsroom/{slug}",
+        "detail": {
+          "maxFetches": 200,
+          "publishedAtSelector": "p[class*=\"article-date-author\"]",
+          "publishedAtUtcOffset": "+08:00",
+          "publishedAtAuthoritative": true
+        },
+        "allowUrlPrefixes": [
+          "https://ag.dji.com/cn/newsroom/"
+        ],
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "dji",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "无人机",
+        "农场软件",
+        "无人作业"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "通过项目guardedFetch及原生 JSON 列表/详情解析器验证原日期、标题和原文HTTP200；不配置未经验证的翻页。"
+    },
+    {
+      "id": "json-kubota-global-news",
+      "name": "Kubota · Global Products & Innovation",
+      "kind": "json_list",
+      "config": {
+        "url": "https://www.kubota.com/news/json/news_list.json",
+        "itemsPath": "news",
+        "titlePaths": [
+          "title"
+        ],
+        "publishedAtPath": "date",
+        "urlTemplate": "https://www.kubota.com{raw:url}",
+        "allowUrlPrefixes": [
+          "https://www.kubota.com/news/"
+        ],
+        "denyUrlPrefixes": [
+          "https://www.kubota.com/news/2026/data/",
+          "https://www.kubota.com/news/2025/data/",
+          "https://www.kubota.com/news/2024/data/"
+        ],
+        "ingestNoiseFilter": {
+          "dropMarkers": [
+            "Personnel Changes",
+            "Repurchase of Own Shares",
+            "Earnings release",
+            "Dividend",
+            "Financial Results"
+          ]
+        },
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "kubota",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农业装备",
+        "无人作业",
+        "GNSS/RTK",
+        "农场软件"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "通过项目guardedFetch及原生 JSON 列表/详情解析器验证原日期、标题和原文HTTP200；不配置未经验证的翻页。"
+    },
+    {
+      "id": "rss-sprout-agritech",
+      "name": "Sprout Agritech · New Zealand Innovation",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.sproutagritech.com/blog/rss",
+        "itemUrlPrefixRewrite": {
+          "from": "http://www.sproutagritech.com/",
+          "to": "https://www.sproutagritech.com/"
+        },
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "sprout-agritech",
+      "signal_group_id": "sprout-agritech",
+      "tags": [
+        "农业AI",
+        "农业技术服务",
+        "行业动态"
+      ],
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "rss-cema-news",
+      "name": "CEMA · European Agricultural Machinery",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.cema-agri.org/publication/news?format=feed&type=rss",
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "cema",
+      "signal_group_id": "cema",
+      "tags": [
+        "ISOBUS",
+        "安全/合规",
+        "政策/监管"
+      ],
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-agritimes-technology",
+      "name": "AgriTimes India · Agriculture Technology",
+      "kind": "web_list",
+      "config": {
+        "url": "https://agritimes.co.in/agri-technology",
+        "itemSelector": ".scroll-item,ul.news-result > li",
+        "linkSelector": "h3 a,h2 a",
+        "titleSelector": "h3 a,h2 a",
+        "publishedAtRegex": "(\\d{2}-[A-Za-z]{3}-\\d{4})",
+        "publishedAtUtcOffset": "+05:30",
+        "allowUrlPrefixes": [
+          "https://agritimes.co.in/agri-technology/"
+        ],
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "signal_group_id": "neur-press",
+      "tags": [
+        "农业AI",
+        "无人机",
+        "数字化运营"
+      ],
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-far-eastern-technology",
+      "name": "Far Eastern Agriculture · Technology",
+      "kind": "web_list",
+      "config": {
+        "url": "https://fareasternagriculture.com/technology",
+        "itemSelector": "article",
+        "linkSelector": "h2.article-title a",
+        "titleSelector": "h2.article-title a",
+        "publishedAtSelector": "time",
+        "allowUrlPrefixes": [
+          "https://fareasternagriculture.com/technology/"
+        ],
+        "pagination": {
+          "nextSelector": ".pagination a[title=Next]",
+          "maxPages": 10
+        },
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "signal_group_id": "alain-charles",
+      "tags": [
+        "智慧灌溉",
+        "无人机",
+        "产品更新"
+      ],
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-african-farming-technology",
+      "name": "African Farming · Technology",
+      "kind": "web_list",
+      "config": {
+        "url": "https://africanfarming.net/technology",
+        "itemSelector": "article",
+        "linkSelector": "h2.article-title a",
+        "titleSelector": "h2.article-title a",
+        "publishedAtSelector": "time",
+        "allowUrlPrefixes": [
+          "https://africanfarming.net/technology/"
+        ],
+        "pagination": {
+          "nextSelector": ".pagination a[title=Next]",
+          "maxPages": 10
+        },
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "signal_group_id": "alain-charles",
+      "tags": [
+        "智慧灌溉",
+        "无人作业",
+        "行业动态"
+      ],
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-farmers-weekly-technology",
+      "name": "Farmers Weekly UK · Technology",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.fwi.co.uk/machinery/technology",
+        "itemSelector": ".pm-card",
+        "linkSelector": ".card-info > a:has(h2)",
+        "titleSelector": "h2",
+        "allowUrlPrefixes": [
+          "https://www.fwi.co.uk/"
+        ],
+        "detail": {
+          "maxFetches": 200,
+          "publishedAtRegex": "property=\"article:published_time\"[^>]+content=\"([^\"]+)\"",
+          "publishedAtAuthoritative": true,
+          "summarySelector": "meta[name=description]"
+        },
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "signal_group_id": "mark-allen-agriculture",
+      "tags": [
+        "GNSS/RTK",
+        "变量作业",
+        "农场软件"
+      ],
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-agrarheute-technology",
+      "name": "agrarheute Germany · Technology",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.agrarheute.com/technik",
+        "itemSelector": "a.teaser[href]",
+        "linkSelector": "a.teaser[href]",
+        "titleSelector": "h2",
+        "allowUrlPrefixes": [
+          "https://www.agrarheute.com/technik/"
+        ],
+        "pagination": {
+          "nextSelector": "a[rel=next]",
+          "maxPages": 10
+        },
+        "detail": {
+          "maxFetches": 200,
+          "publishedAtRegex": "property=\"article:published_time\"[^>]+content=\"([^\"]+)\"",
+          "publishedAtAuthoritative": true,
+          "summarySelector": "meta[name=description]"
+        },
+        "ingestNoiseFilter": {
+          "dropMarkersTitleOnly": [
+            "maschine des tages",
+            "maschinen des tages",
+            "traktor für",
+            "traktor fuer"
+          ]
+        },
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "signal_group_id": "deutscher-landwirtschaftsverlag",
+      "tags": [
+        "农业机器人",
+        "无人作业",
+        "行业动态"
+      ],
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-agriwebb-blogs",
+      "name": "AgriWebb · Farm Software & Data Integrations",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.agriwebb.com/blogs/",
+        "itemSelector": "a[href*=\"/blog/\"]",
+        "linkSelector": "a[href*=\"/blog/\"]",
+        "detail": {
+          "maxFetches": 200,
+          "titleSelector": "h1",
+          "titleAuthoritative": true,
+          "publishedAtSelector": "div:has(> h1) span.lato-600",
+          "publishedAtUtcOffset": "+10:00",
+          "publishedAtAuthoritative": true
+        },
+        "allowUrlPrefixes": [
+          "https://www.agriwebb.com/blog/"
+        ],
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "agriwebb",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农场软件",
+        "数据互通",
+        "畜牧科技"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "项目 guardedFetch + 原生 web_list/详情解析验证；原页面发布日期，原文 HTTP 200，人工核验站点身份与文章农业软件内容。两个 AgriWebb 栏目同组计一次独立参与者。网页无经验证可抓取分页，不配置分页。"
+    },
+    {
+      "id": "web-agriwebb-product-updates",
+      "name": "AgriWebb · Product Updates",
+      "kind": "web_list",
+      "config": {
+        "url": "https://news.agriwebb.com/",
+        "itemSelector": ".newsfeed__newsitem",
+        "linkSelector": "a.newsitem__title",
+        "titleSelector": "a.newsitem__title h2",
+        "publishedAtRegex": "•\\s*((?:January|February|March|April|May|June|July|August|September|October|November|December)\\s+\\d{1,2},\\s+\\d{4})",
+        "publishedAtUtcOffset": "+10:00",
+        "allowUrlPrefixes": [
+          "https://news.agriwebb.com/"
+        ],
+        "pagination": {
+          "nextSelector": "a[rel=\"next\"]",
+          "maxPages": 8
+        },
+        "sortByPublishedAt": true,
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true,
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "signal_group_id": "agriwebb",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "官方",
+        "农场软件",
+        "数据互通",
+        "畜牧科技"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true,
+      "$comment": "项目 guardedFetch + 原生 web_list/详情解析验证；原页面发布日期，原文 HTTP 200，人工核验站点身份与文章农业软件内容。两个 AgriWebb 栏目同组计一次独立参与者。原生解析验证全部 8 页，共 75 篇，不超过 10 页。"
+    },
+    {
+      "id": "web-nongjx-company-news",
+      "name": "农机网 · 企业装备与技术动态",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.nongjx.com/news/t1359/list.html",
+        "itemSelector": ".content_list > ul > li",
+        "linkSelector": "p a",
+        "titleSelector": "p a",
+        "publishedAtRegex": "(\\d{4}-\\d{2}-\\d{2})",
+        "publishedAtUtcOffset": "+08:00",
+        "allowUrlPrefixes": [
+          "https://www.nongjx.com/news/detail/"
+        ],
+        "pagination": {
+          "nextSelector": ".newspages a[title=下一页]",
+          "maxPages": 10
+        },
+        "detail": {
+          "maxFetches": 200,
+          "upgradeDatePrecision": true,
+          "publishedAtRegex": "\"datePublished\"\\s*:\\s*\"([^\"]+)\"",
+          "publishedAtUtcOffset": "+08:00",
+          "publishedAtAuthoritative": true,
+          "summarySelector": "meta[name=description]"
+        },
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "signal_group_id": "xingwangbao-mingtong",
+      "tags": [
+        "装备发布",
+        "农业AI",
+        "无人作业"
+      ],
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-dlg-agriculture-releases",
+      "name": "DLG · Agriculture Research, Technology & Standards",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.dlg.org/en/press/press-releases-agriculture",
+        "itemSelector": ".teaser-list:has(a[href^='/en/detail/'])",
+        "linkSelector": "a.teaser-list__title",
+        "titleSelector": "a.teaser-list__title",
+        "publishedAtSelector": ".teaser-emphasize__date",
+        "publishedAtUtcOffset": "+02:00",
+        "allowUrlPrefixes": [
+          "https://www.dlg.org/en/detail/"
+        ],
+        "pagination": {
+          "nextSelector": ".pagination .next a",
+          "maxPages": 10
+        },
+        "detail": {
+          "maxFetches": 200,
+          "upgradeDatePrecision": true
+        },
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "dlg",
+      "signal_group_id": "dlg",
+      "tags": [
+        "评测/田间试验",
+        "农业机器人",
+        "安全/合规"
+      ],
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-agritimes-equipment",
+      "name": "AgriTimes India · Farm Equipment",
+      "kind": "web_list",
+      "config": {
+        "url": "https://agritimes.co.in/farm-equipment",
+        "itemSelector": ".scroll-item,ul.news-result > li",
+        "linkSelector": "h3 a,h2 a",
+        "titleSelector": "h3 a,h2 a",
+        "publishedAtRegex": "(\\d{2}-[A-Za-z]{3}-\\d{4})",
+        "publishedAtUtcOffset": "+05:30",
+        "allowUrlPrefixes": [
+          "https://agritimes.co.in/farm-equipment/"
+        ],
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "signal_group_id": "neur-press",
+      "tags": [
+        "装备发布",
+        "变量作业",
+        "GNSS/RTK"
+      ],
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
+    },
+    {
+      "id": "web-agrospectrum-digital-tech",
+      "name": "AgroSpectrum India · Digital Technologies",
+      "kind": "web_list",
+      "config": {
+        "url": "https://agrospectrumindia.com/category/agrotech/digital-technologies",
+        "itemSelector": ".hero-post-item",
+        "linkSelector": "h4 a",
+        "titleSelector": "h4 a",
+        "publishedAtSelector": ".meta-11",
+        "publishedAtUtcOffset": "+05:30",
+        "allowUrlPrefixes": [
+          "https://agrospectrumindia.com/news/",
+          "https://agrospectrumindia.com/interviews/",
+          "https://agrospectrumindia.com/features/"
+        ],
+        "_aihot": {
+          "initialBackfillLimit": 200,
+          "initialBackfillMonths": 24
+        },
+        "maxItemsPerRun": 300,
+        "maxAgeMonths": 24,
+        "requirePublishedAt": true
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "signal_group_id": "mmactiv-sci-tech",
+      "tags": [
+        "农业AI",
+        "遥感",
+        "农场软件"
+      ],
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "enabled": true
     }
   ]
 }

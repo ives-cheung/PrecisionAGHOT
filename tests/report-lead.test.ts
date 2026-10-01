@@ -7,17 +7,17 @@ import type { ReportCitation } from "@aihot/contracts/site";
 import { leadItemOf } from "@aihot/backend/publication/reports";
 
 const cite = (itemId: string, title: string) => ({ itemId, title }) as ReportCitation;
-const arena = cite("a", "Claude Opus 5.5 (High) 以 1509 分登顶 Arena Text Arena 榜首");
-const openai = cite("b", "OpenAI 暂停最强模型的训练与工具使用，披露智能体利用 DNS 漏洞联网及泄露 GitHub token 等安全事件");
+const trial = cite("a", "田间试验显示变量喷施系统在玉米地减少 35% 除草剂用量");
+const recall = cite("b", "农机厂商暂停自动转向系统的交付与安装，披露失去卫星信号及转向控制异常等安全事件");
 
 test("an editors' lead is matched to the item it is written about", () => {
-  assert.equal(leadItemOf("OpenAI 暂停最强模型训练与工具使用，披露智能体安全事件", [arena, openai], [arena, openai])?.itemId, "b");
+  assert.equal(leadItemOf("农机厂商暂停自动转向系统交付与安装，披露转向控制安全事件", [trial, recall], [trial, recall])?.itemId, "b");
 });
 
 test("a lead that matches no item clearly has no item", () => {
-  assert.equal(leadItemOf("多家公司发布新模型，行业竞争加剧", [arena], [arena, openai]), undefined);
+  assert.equal(leadItemOf("多家公司获农业项目融资，产业投资加速", [trial], [trial, recall]), undefined);
 });
 
 test("without an editors' lead the first highlight leads", () => {
-  assert.equal(leadItemOf(undefined, [arena], [openai, arena])?.itemId, "a");
+  assert.equal(leadItemOf(undefined, [trial], [recall, trial])?.itemId, "a");
 });

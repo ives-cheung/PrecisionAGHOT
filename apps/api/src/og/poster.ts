@@ -10,7 +10,7 @@ import { SITE } from "@aihot/industry/site";
 import { config } from "@aihot/backend/config";
 import { fonts, h, nameMark, OG_PNG, SITE_HOST, type Node } from "./render.ts";
 
-export const POSTER_TEMPLATE_VERSION = "poster-2026-09-29.1";
+export const POSTER_TEMPLATE_VERSION = "poster-precisionaghot-2026-09-30.2";
 const WIDTH = 1080;
 const HEIGHT = 1440;
 const CACHE_DIR = path.join(config.dataDir, "ogcache");
@@ -31,8 +31,8 @@ function clamp(text: string, max: number) {
   return chars.length > max ? `${chars.slice(0, max - 1).join("")}…` : chars.join("");
 }
 
-const INK = "#0e191b";
-const ACCENT = "#176b75";
+const INK = "#171717";
+const ACCENT = "#171717";
 
 async function tree(p: Poster): Promise<Node> {
   const title = clamp(p.title, 72);
@@ -51,8 +51,7 @@ async function tree(p: Poster): Promise<Node> {
       padding: "84px 88px 72px",
       fontFamily: "Noto Sans SC",
       color: INK,
-      backgroundColor: "#f5f6f5",
-      backgroundImage: "radial-gradient(circle at 100% 0%, rgba(23,107,117,0.16), rgba(245,246,245,0) 52%), radial-gradient(circle at 0% 100%, rgba(44,226,232,0.10), rgba(245,246,245,0) 45%)",
+      backgroundColor: "#f7f7f7",
     },
     [
       h("div", { display: "flex", alignItems: "center", justifyContent: "space-between" }, [
@@ -63,7 +62,7 @@ async function tree(p: Poster): Promise<Node> {
         h("div", { width: 12, height: 12, borderRadius: 999, backgroundColor: ACCENT, marginRight: 16 }),
         h("div", { display: "flex", fontSize: 30, fontWeight: 700, color: ACCENT, letterSpacing: 1 }, clamp(p.kicker, 20)),
         p.score !== null
-          ? h("div", { display: "flex", marginLeft: 20, padding: "4px 16px", borderRadius: 999, backgroundColor: "rgba(23,107,117,0.09)", fontSize: 26, color: "#0f5a63" }, `精选 · ${Math.round(p.score)} 分`)
+          ? h("div", { display: "flex", marginLeft: 20, padding: "4px 16px", borderRadius: 999, backgroundColor: "rgba(0,0,0,0.06)", fontSize: 26, color: INK }, `精选 · ${Math.round(p.score)} 分`)
           : null,
       ].filter(Boolean)),
       h("div", { display: "flex", marginTop: 30, fontSize: titleSize, fontWeight: 700, lineHeight: 1.3, color: INK }, title),
@@ -77,7 +76,7 @@ async function tree(p: Poster): Promise<Node> {
           h("img", { width: 200, height: 200 }, undefined, { src: qr, width: 200, height: 200 }),
           h("div", { display: "flex", flexDirection: "column", marginLeft: 44, flex: 1 }, [
             h("div", { display: "flex", fontSize: 36, fontWeight: 700, color: INK }, "长按识别二维码"),
-            h("div", { display: "flex", marginTop: 14, fontSize: 28, lineHeight: 1.5, color: "#66757a" }, "阅读全文、中文译文与原文链接"),
+            h("div", { display: "flex", marginTop: 14, fontSize: 28, lineHeight: 1.5, color: "#666666" }, "阅读中文摘要与原文链接"),
             h("div", { display: "flex", marginTop: 22, fontSize: 26, color: ACCENT }, SITE_HOST),
           ]),
         ],

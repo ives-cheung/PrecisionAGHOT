@@ -4,7 +4,9 @@ import { guardedFetch } from "../lib/http-fetch.ts";
 import { collapseWhitespace, stripTags } from "../lib/text.ts";
 import { readable, type ExtractedBody } from "../content/extract.ts";
 import { sanitizeBody } from "../content/sanitize.ts";
+import { identityKeyForUrl } from "../lib/url.ts";
 import { jinaRead } from "../providers/jina.ts";
+import { assertSupportedConfig } from "./config-keys.ts";
 import { FetchError, type Candidate, type SourceRow } from "./types.ts";
 
 const JINA_PREFIX = "https://r.jina.ai/";
@@ -23,7 +25,7 @@ function atOffset(y: string | number, mo: string | number, d: string | number, h
  * on every host: a time with its zone, and an ISO date alone (UTC midnight). Anything else it would read
  * in the server's local zone (UTC in Docker), so "2026-09-26 10:00" is read in the source's offset instead.
  */
-export function parseLooseDate(value: string | null | undefined, utcOffset = "+08:00"): Date | null {
+export function parseLooseDate(value: string | null | undefined, utcOffset = "+08:00", format?: "DMY" | "MDY"): Date | null {
   if (!value) return null;
   const v = value.trim();
   if (!v) return null;
@@ -35,6 +37,16 @@ export function parseLooseDate(value: string | null | undefined, utcOffset = "+0
   const m = /(\d{4})[-/.年](\d{1,2})[-/.月](\d{1,2})日?(?:(?:T|\s*)(\d{1,2}):(\d{2})(?::(\d{2}))?)?/.exec(v);
   if (m) {
     const [, y, mo, d, h = "00", mi = "00", s = "00"] = m;
+    return atOffset(y!, mo!, d!, h, mi, s, utcOffset);
+  }
+  // Dotted numeric dates are ambiguous: only the source's explicit DMY/MDY rule changes their order.
+  const dotted = format ? /^(\d{1,2})\.(\d{1,2})\.(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/.exec(v) : null;
+  if (dotted) {
+    const [, first, second, y, h = "00", mi = "00", s = "00"] = dotted;
+    const [d, mo] = format === "DMY" ? [first, second] : [second, first];
+    const check = new Date(Date.UTC(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s)));
+    if (check.getUTCFullYear() !== Number(y) || check.getUTCMonth() + 1 !== Number(mo) || check.getUTCDate() !== Number(d)
+      || check.getUTCHours() !== Number(h) || check.getUTCMinutes() !== Number(mi) || check.getUTCSeconds() !== Number(s)) return null;
     return atOffset(y!, mo!, d!, h, mi, s, utcOffset);
   }
   // "Sep 26, 2026": Date.parse reads it in the host's zone, so take its fields and place them in the offset.
@@ -111,17 +123,17 @@ function absolute(href: string | undefined, base: string): string | null {
   }
 }
 
-async function fetchListingText(source: SourceRow): Promise<{ text: string; viaJina: boolean; base: string }> {
-  const url = String(source.config.url ?? "");
+async function fetchListingText(source: SourceRow, target?: string): Promise<{ text: string; viaJina: boolean; base: string; pageUrl: string }> {
+  const url = target ?? String(source.config.url ?? "");
   if (!url) throw new FetchError("url missing");
   if (url.startsWith(JINA_PREFIX)) {
     const target = url.slice(JINA_PREFIX.length);
     const page = await jinaRead(target, { purpose: "source_listing", subject: `source:${source.id}`, cacheToleranceSeconds: source.config.cacheToleranceSeconds, perRead: true });
-    return { text: page.markdown, viaJina: true, base: source.config.baseUrl ?? target };
+    return { text: page.markdown, viaJina: true, base: source.config.baseUrl ?? target, pageUrl: target };
   }
   const res = await guardedFetch(url, { headers: { accept: "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8" }, timeoutMs: 25_000 });
   if (res.status !== 200) throw new FetchError(`HTTP ${res.status}`, res.status);
-  return { text: res.text(), viaJina: false, base: source.config.baseUrl ?? url };
+  return { text: res.text(), viaJina: false, base: source.config.baseUrl ?? url, pageUrl: res.url };
 }
 
 export function fromMarkdown(md: string, base: string, source: SourceRow): Candidate[] {
@@ -172,11 +184,11 @@ export function fromHtml(html: string, base: string, source: SourceRow): Candida
     let publishedAt: Date | null = null;
     if (c.publishedAtSelector) {
       const dateEl = el.find(c.publishedAtSelector).first();
-      publishedAt = parseLooseDate(dateEl.attr("datetime") ?? dateEl.attr("title") ?? dateEl.text(), c.publishedAtUtcOffset);
+      publishedAt = parseLooseDate(dateEl.attr("datetime") ?? dateEl.attr("title") ?? dateEl.text(), c.publishedAtUtcOffset, c.publishedAtFormat);
     }
     if (!publishedAt && c.publishedAtRegex) {
       const m = new RegExp(c.publishedAtRegex).exec($.html(el));
-      publishedAt = parseLooseDate(m?.[1], c.publishedAtUtcOffset);
+      publishedAt = parseLooseDate(m?.[1], c.publishedAtUtcOffset, c.publishedAtFormat);
     }
     seen.add(url);
     out.push({ url, title, publishedAt });
@@ -303,6 +315,8 @@ async function fromMimoHome(html: string, base: string, source: SourceRow): Prom
 }
 
 export async function fetchWebList(source: SourceRow): Promise<Candidate[]> {
+  assertSupportedConfig("web_list", source.config);
+  if (source.config.pagination) return fetchPaginatedHtml(source);
   const { text, viaJina, base } = await fetchListingText(source);
   const mode = source.config.adapter === "mimo_home" ? "mimo_home" : source.config.parseMode ?? (viaJina ? "markdown" : "html");
   let out: Candidate[];
@@ -311,6 +325,48 @@ export async function fetchWebList(source: SourceRow): Promise<Candidate[]> {
   else if (mode === "docusaurus_changelog") out = fromDocusaurusChangelog(text, base, source);
   else out = fromHtml(text, base, source);
   if (out.length === 0) throw new FetchError(`no items matched (${mode})`);
+  return out;
+}
+
+/** Bounded same-site pagination. No partial result escapes if a later page fails. */
+async function fetchPaginatedHtml(source: SourceRow): Promise<Candidate[]> {
+  const p = source.config.pagination as { nextSelector: string; maxPages: number };
+  const out: Candidate[] = [];
+  const identities = new Set<string>();
+  const visited = new Set<string>();
+  let next = String(source.config.url ?? "");
+  let origin: string | null = null;
+  for (let page = 0; page < p.maxPages; page += 1) {
+    const { text, pageUrl } = await fetchListingText(source, next);
+    const current = new URL(pageUrl);
+    current.hash = "";
+    origin ??= current.origin;
+    if (current.origin !== origin) throw new FetchError("pagination changed origin");
+    if (visited.has(current.toString())) break;
+    visited.add(current.toString());
+    const pageSource = { ...source, config: { ...source.config, url: current.toString() } };
+    const candidates = fromHtml(text, source.config.baseUrl ?? current.toString(), pageSource);
+    if (!candidates.length) throw new FetchError(`no items matched (html page ${page + 1})`);
+    for (const c of candidates) {
+      const key = c.identityKey ?? identityKeyForUrl(c.url) ?? c.url;
+      if (!identities.has(key)) {
+        identities.add(key);
+        out.push(c);
+      }
+    }
+    if (page + 1 >= p.maxPages) break;
+    const $ = cheerio.load(text);
+    const link = $(p.nextSelector).first();
+    const href = link.attr("href") ?? link.find("a[href]").first().attr("href");
+    if (!href) break;
+    const target = absolute(href, current.toString());
+    if (!target) throw new FetchError("pagination next link is not an HTTP URL");
+    const parsed = new URL(target);
+    parsed.hash = "";
+    if (parsed.origin !== origin) throw new FetchError("pagination next link changed origin");
+    next = parsed.toString();
+    if (visited.has(next)) break;
+  }
   return out;
 }
 
@@ -353,9 +409,9 @@ export async function fetchDetail(url: string, source: SourceRow, need: DetailNe
   if (need.date && dateText !== null) {
     if ($ && !dateInJina && d.publishedAtSelector) {
       const el = $(d.publishedAtSelector).first();
-      publishedAt = parseLooseDate(el.attr("datetime") ?? el.attr("title") ?? el.text(), d.publishedAtUtcOffset);
+      publishedAt = parseLooseDate(el.attr("datetime") ?? el.attr("title") ?? el.text(), d.publishedAtUtcOffset, d.publishedAtFormat);
     }
-    if (!publishedAt && d.publishedAtRegex) publishedAt = parseLooseDate(new RegExp(d.publishedAtRegex).exec(dateText)?.[1], d.publishedAtUtcOffset);
+    if (!publishedAt && d.publishedAtRegex) publishedAt = parseLooseDate(new RegExp(d.publishedAtRegex).exec(dateText)?.[1], d.publishedAtUtcOffset, d.publishedAtFormat);
     // An authoritative rule is the only source of the date: when its byline is missing, no other
     // timestamp on the page (an update time, a related post) stands in for it.
     const authoritative = d.publishedAtAuthoritative === true && !!(d.publishedAtSelector || d.publishedAtRegex);

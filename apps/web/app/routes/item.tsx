@@ -189,8 +189,7 @@ export default function ItemPage() {
     </div>
   );
 
-  // Rails: the piece's facts on the left (wide screens), the editor's notes on the right, the outline
-  // under the facts (or under the notes when only the right rail shows).
+  // The reading rail keeps the source, notes and outline together on wide screens.
   const facts = (
     <RailSection title="来源">
       <div className="text-[14px] font-semibold leading-snug text-ink">{isX ? item.x!.authorName : item.source.name}</div>
@@ -249,8 +248,8 @@ export default function ItemPage() {
     <div className="mx-auto max-w-[var(--page-max-reading)] pb-8">
       {item.body && <ReadingProgress />}
 
-      {/* Phones: a sticky bar with back, 收藏, the original, share and more. Desktop puts these in the rails. */}
-      <div className="sticky top-0 z-30 -mx-4 flex h-12 items-center gap-1.5 border-b border-line-soft bg-bg/95 px-4 backdrop-blur lg:hidden">
+      {/* Smaller screens keep the reading controls above the article. */}
+      <div className="sticky top-0 z-30 -mx-5 flex h-14 items-center gap-1.5 border-b border-line-soft bg-bg/95 px-5 backdrop-blur lg:mx-0 lg:px-0 xl:hidden">
         {backButton}
         <span className="flex-1" />
         <StarButton item={item} size={32} />
@@ -263,26 +262,20 @@ export default function ItemPage() {
         {moreMenu}
       </div>
 
-      {/* The text on the page in one column; back and the facts in the left rail, actions and notes in the right. */}
+      {/* The article keeps its reading width beside a compact source and navigation rail. */}
       <ArticleLayout
-        left={
+        right={
           <>
             {backButton}
+            {actions}
             {facts}
+            {notes}
             {outline}
           </>
         }
-        right={
-          <>
-            {actions}
-            {notes}
-            <div className="space-y-8 2xl:hidden">{outline}</div>
-          </>
-        }
       >
-        <div className="hidden lg:block 2xl:hidden">{backButton}</div>
-        <article className="pb-6 pt-6 lg:pt-2 2xl:pt-1">
-          <div className={`flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] text-ink-3 2xl:hidden ${isX ? "" : "mb-3"}`}>
+        <article className="pb-6 pt-7 xl:pt-1">
+          <div className={`flex flex-wrap items-center gap-x-1.5 gap-y-1.5 text-[12px] leading-relaxed text-ink-3 ${isX ? "" : "mb-4"}`}>
             <span className="font-semibold text-ink-2">{isX ? item.x!.authorName : item.source.name}</span>
             {isX && <span>· @{item.x!.handle} · X</span>}
             {item.author && !isX && <span>· {item.author}</span>}
@@ -290,28 +283,28 @@ export default function ItemPage() {
             <time dateTime={publishedIso} className="mono">{fullDateTime(publishedIso)}</time>
             <span suppressHydrationWarning>· {relativeTime(publishedIso)}</span>
             {item.selected && (
-              <span className="ml-1 lg:hidden">
+              <span className="ml-1 xl:hidden">
                 <SelectedBadge />
               </span>
             )}
             {item.score !== null && (
-              <span className="ml-1 lg:hidden">
+              <span className="ml-1 xl:hidden">
                 <ScoreLabel score={item.score} />
               </span>
             )}
           </div>
-          {!isX && <h1 className="text-[26px] font-bold leading-[1.38] tracking-[-0.01em] text-ink lg:text-[32px] lg:leading-[1.34] xl:text-[36px] xl:leading-[1.3]">{item.title}</h1>}
+          {!isX && <h1 className="text-[28px] font-semibold leading-[1.45] tracking-[-0.025em] text-ink sm:text-[34px] xl:text-[38px] xl:leading-[1.35]">{item.title}</h1>}
           {!isX && item.originalTitle && <p className="mt-2.5 text-[14px] leading-relaxed text-ink-4">{item.originalTitle}</p>}
 
           {item.summary && (
             <section className={isX ? "mt-4" : "mt-7 xl:mt-8"}>
-              <div className="mb-2 text-[12px] font-semibold text-accent">{summaryOnly ? "摘要" : "AI 导读"}</div>
-              <p className="text-[18px] leading-[1.7] text-ink xl:text-[20px] xl:leading-[1.7]">{item.summary}</p>
+              <div className="mb-2 text-[12px] font-medium text-ink-3">摘要</div>
+              <p className="text-[17px] leading-[1.85] text-ink-2 sm:text-[18px] xl:text-[19px]">{item.summary}</p>
             </section>
           )}
 
           {item.reason && !summaryOnly && (
-            <section className="mt-6 border-t border-line pt-4 lg:hidden">
+            <section className="mt-6 border-t border-line pt-4 xl:hidden">
               <div className="mb-1 text-[12px] font-semibold text-ink-3">推荐理由</div>
               <p className="text-[15px] leading-[1.75] text-ink-2">{item.reason}</p>
             </section>
@@ -361,7 +354,7 @@ export default function ItemPage() {
           </p>
 
           {item.tags.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-1.5 lg:hidden">
+            <div className="mt-4 flex flex-wrap gap-1.5 xl:hidden">
               {item.tags.slice(0, 6).map((t) => (
                 <Link key={t} to={`/all?tag=${encodeURIComponent(t)}`} className="chip">
                   #{t}

@@ -21,21 +21,16 @@ export function ReadingLayout({ children, aside, footer, className = "", asideCl
 
 /**
  * Long reads (articles, terms, privacy): no sheet, the text sits on the page in a column of at most
- * 760px, the width Chinese magazines and news sites use (680–730px at 16–17px, about 42 characters a
- * line). From 2xl a rail on each side (the piece's facts left, notes right) keeps the page filling a
- * 16:9 screen with the column in the middle; from lg only the right rail shows, beside the centred
- * column; phones read one column. `railTop` clears a sticky top bar.
+ * 760px. A right rail holds sources, notes and navigation on wide screens; smaller screens retain
+ * the full reading width. `railTop` clears a sticky top bar.
  */
-export function ArticleLayout({ children, left, right, railTop = "top-6" }: { children: ReactNode; left?: ReactNode; right?: ReactNode; railTop?: string }) {
+export function ArticleLayout({ children, right, railTop = "top-6" }: { children: ReactNode; right?: ReactNode; railTop?: string }) {
   return (
-    <div className="mx-auto grid max-w-[var(--page-max-reading)] grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_240px] lg:gap-x-12 2xl:grid-cols-[minmax(200px,1fr)_minmax(0,760px)_minmax(200px,1fr)] 2xl:gap-x-12">
-      <aside className="hidden 2xl:block">
-        <div className={`sticky ${railTop} max-w-[260px] space-y-8`}>{left}</div>
-      </aside>
+    <div className="mx-auto grid max-w-[var(--page-max-reading)] grid-cols-[minmax(0,1fr)] xl:grid-cols-[minmax(0,1fr)_210px] xl:gap-x-10">
       <div className="min-w-0">
         <div className="mx-auto max-w-[760px]">{children}</div>
       </div>
-      <aside className="hidden lg:block">
+      <aside className="hidden xl:block">
         <div className={`sticky ${railTop} ml-auto max-w-[260px] space-y-8`}>{right}</div>
       </aside>
     </div>
@@ -75,9 +70,9 @@ export function MoreLink({ to, children }: { to: string; children: ReactNode }) 
 /** Quiet empty / unavailable state inside a card or list. */
 export function EmptyState({ title, children, action }: { title: ReactNode; children?: ReactNode; action?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center px-6 py-14 text-center">
+    <div className="flex flex-col items-center px-5 py-9 text-center sm:py-10">
       <div className="text-[15px] font-semibold text-ink-2">{title}</div>
-      {children && <p className="mt-1.5 max-w-sm text-[13px] leading-relaxed text-ink-4">{children}</p>}
+      {children && <p className="mt-2 max-w-md text-[13px] leading-[1.8] text-ink-3">{children}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );

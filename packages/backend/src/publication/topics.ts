@@ -4,7 +4,7 @@ import path from "node:path";
 import { REPO_ROOT } from "../config.ts";
 import { sql } from "../db.ts";
 import { cached } from "../lib/cache.ts";
-import { ITEM_COLUMNS, ITEM_FROM, selectedCondition, toFeedItemSummary, type ItemRow } from "./items.ts";
+import { ITEM_COLUMNS, ITEM_FROM, listedCondition, selectedCondition, toFeedItemSummary, type ItemRow } from "./items.ts";
 
 export interface TopicRow {
   slug: string;
@@ -17,7 +17,7 @@ export interface TopicRow {
   position: number;
 }
 
-type TopicCount = { slug: string; total: number; recent: number; pages: number; indexable: boolean; latest: Date | null };
+type TopicCount = { slug: string; total: number; recent: number; pages: number; indexable: boolean; latest: Date | null; allTotal: number; allLatestAt: Date | null };
 const topicsCache = cached(
   () => sql<TopicRow[]>`SELECT slug, name, grp, entity_id, tags, definition, related, position FROM topics ORDER BY position`,
   { freshMs: 60_000, maxStaleMs: 10 * 60_000 },
@@ -75,27 +75,36 @@ export function topicPageCounts(): Promise<TopicCount[]> {
 }
 
 /**
- * One pass over the selected set (a few thousand rows from its partial index) instead of one
- * scan per topic; a topic counts an item when their tags overlap, as `p.tags && match` does.
+ * One pass over the readable public set instead of one scan per topic. Selected counts still
+ * control pagination and indexing; source coverage follows the pool's eligibility and release gate.
  */
 async function queryTopicCounts(): Promise<TopicCount[]> {
+  const now = new Date();
   const [topics, items] = await Promise.all([
     sql<Array<Pick<TopicRow, "slug" | "entity_id" | "tags">>>`SELECT slug, entity_id, tags FROM topics ORDER BY position`,
-    sql<{ tags: string[]; timeline_at: Date }[]>`SELECT p.tags, p.timeline_at FROM publications p WHERE p.visibility = 'public' AND p.selected`,
+    sql<{ tags: string[]; timeline_at: Date; published_at: Date | null; selected: boolean }[]>`
+      SELECT p.tags, p.timeline_at, p.published_at, p.selected FROM publications p
+      WHERE ${listedCondition(now)} AND p.eligible`,
   ]);
-  const recentFrom = Date.now() - 30 * 86400_000;
+  const recentFrom = now.getTime() - 30 * 86400_000;
   return topics.map((t) => {
     const match = new Set(topicMatchTags(t));
     let total = 0;
     let recent = 0;
     let latest: Date | null = null;
+    let allTotal = 0;
+    let allLatestAt: Date | null = null;
     for (const it of items) {
       if (!it.tags.some((tag) => match.has(tag))) continue;
+      allTotal += 1;
+      const sourceAt = it.published_at ?? it.timeline_at;
+      if (!allLatestAt || sourceAt > allLatestAt) allLatestAt = sourceAt;
+      if (!it.selected) continue;
       total += 1;
       if (it.timeline_at.getTime() > recentFrom) recent += 1;
       if (!latest || it.timeline_at > latest) latest = it.timeline_at;
     }
-    return { slug: t.slug, total, recent, latest, pages: Math.max(1, Math.ceil(total / TOPIC_PAGE_SIZE)), indexable: total >= 50 || (total >= 20 && recent > 0) };
+    return { slug: t.slug, total, recent, latest, allTotal, allLatestAt, pages: Math.max(1, Math.ceil(total / TOPIC_PAGE_SIZE)), indexable: total >= 50 || (total >= 20 && recent > 0) };
   });
 }
 
@@ -108,6 +117,8 @@ export interface TopicSummary {
   recent: number;
   indexable: boolean;
   latestAt: string | null;
+  allTotal: number;
+  allLatestAt: string | null;
 }
 
 export async function listTopicSummaries(): Promise<TopicSummary[]> {
@@ -115,7 +126,7 @@ export async function listTopicSummaries(): Promise<TopicSummary[]> {
   const counts = new Map((await topicPageCounts()).map((c) => [c.slug, c]));
   return topics.map((t) => {
     const c = counts.get(t.slug);
-    return { slug: t.slug, name: t.name, group: t.grp, definition: t.definition, total: c?.total ?? 0, recent: c?.recent ?? 0, indexable: c?.indexable ?? false, latestAt: c?.latest?.toISOString() ?? null };
+    return { slug: t.slug, name: t.name, group: t.grp, definition: t.definition, total: c?.total ?? 0, recent: c?.recent ?? 0, indexable: c?.indexable ?? false, latestAt: c?.latest?.toISOString() ?? null, allTotal: c?.allTotal ?? 0, allLatestAt: c?.allLatestAt?.toISOString() ?? null };
   });
 }
 

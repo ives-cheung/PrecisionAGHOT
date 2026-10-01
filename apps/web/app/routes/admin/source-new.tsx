@@ -27,7 +27,7 @@ interface Preview {
 export default function NewSource() {
   const navigate = useNavigate();
   const { run, pending } = useAdminAction();
-  const [form, setForm] = useState({ id: "", name: "", kind: "rss", tier: "T2", participation_mode: "editorial", interval_minutes: 30, first_party: false, site_fulltext: true, syndicate_fulltext: false, tags: "" });
+  const [form, setForm] = useState({ id: "", name: "", kind: "rss", tier: "T2", participation_mode: "editorial", interval_minutes: 30, first_party: false, site_fulltext: false, syndicate_fulltext: false, tags: "" });
   const [config, setConfig] = useState(JSON.stringify(TEMPLATES.rss, null, 2));
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -49,10 +49,10 @@ export default function NewSource() {
         <Card title="信源定义">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="ID" hint="小写字母、数字和连字符，创建后不可改">
-              <Input value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value.toLowerCase() })} placeholder="openai-blog" />
+              <Input value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value.toLowerCase() })} placeholder="john-deere-news" />
             </Field>
             <Field label="名称">
-              <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="OpenAI 博客" />
+              <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="John Deere 新闻" />
             </Field>
             <Field label="类型">
               <Select

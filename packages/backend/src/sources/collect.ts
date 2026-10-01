@@ -21,7 +21,7 @@ export interface CollectResult {
   error?: string;
 }
 
-const MAX_ITEMS_PER_RUN = 60;
+const DEFAULT_MAX_ITEMS_PER_RUN = 60;
 
 export function noiseFiltered(c: Candidate, source: SourceRow): boolean {
   const f = source.config.ingestNoiseFilter;
@@ -124,6 +124,9 @@ export async function collectSource(sourceId: string, opts: { force?: boolean } 
     }
     found = candidates.length;
     candidates = candidates.filter((c) => allowed(c.url, source)).map((c) => rewriteUrl(c, source)).filter((c) => !noiseFiltered(c, source));
+    const maxAgeCutoff = source.config.maxAgeMonths ? Date.now() - source.config.maxAgeMonths * 30 * DAY_MS : null;
+    const withinAge = (c: Candidate) => maxAgeCutoff === null || !c.publishedAt || c.publishedAt.getTime() >= maxAgeCutoff;
+    if (source.config.detail?.publishedAtAuthoritative !== true) candidates = candidates.filter(withinAge);
     if (source.config.sortByPublishedAt) candidates.sort((a, b) => (b.publishedAt?.getTime() ?? 0) - (a.publishedAt?.getTime() ?? 0));
 
     // First import of a new source: bounded, and archived by source time (never "today", never pushed).
@@ -134,7 +137,7 @@ export async function collectSource(sourceId: string, opts: { force?: boolean } 
       candidates = candidates.filter((c) => !c.publishedAt || c.publishedAt.getTime() >= cutoff).slice(0, backfillLimit);
     } else if (source.kind !== "x_search") {
       // X keeps every post it read: its watermark already covers them, so a cut here would lose them.
-      candidates = candidates.slice(0, MAX_ITEMS_PER_RUN);
+      candidates = candidates.slice(0, source.config.maxItemsPerRun ?? DEFAULT_MAX_ITEMS_PER_RUN);
     }
 
     // Detail pages only for material we have not seen (bounded per run), and only for what the listing lacks.
@@ -179,6 +182,8 @@ export async function collectSource(sourceId: string, opts: { force?: boolean } 
       }
     }
 
+    // A missing list date may have been filled by a detail page; apply the same age limit to it.
+    candidates = candidates.filter(withinAge).filter((c) => source.config.requirePublishedAt !== true || (!!c.publishedAt && Number.isFinite(c.publishedAt.getTime())));
     ({ created, revised } = await store(sourceId, candidates, firstImport ? "first-import" : null));
 
     if (firstImport) nextCursor.initializedAt = new Date().toISOString();
@@ -239,7 +244,7 @@ export async function collectXShard(key: string, sourceIds: string[]): Promise<{
   const members = (
     await sql<SourceRow[]>`
       SELECT id, name, kind, config, tier, participation_mode, first_party, interval_minutes, enabled, cursor, fail_count
-      FROM sources WHERE id IN ${sql(sourceIds)}`
+      FROM sources WHERE id IN ${sql(sourceIds)} ORDER BY id`
   ).filter((m) => m.enabled && shardHandle(m));
   if (members.length === 0) return { key, status: "skipped", accounts: 0, found: 0, created: 0 };
   const minutes = shardMinutes(members[0]!.participation_mode);

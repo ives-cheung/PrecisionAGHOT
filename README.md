@@ -1,177 +1,131 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.png">
-    <img src="docs/assets/banner-light.png" alt="AIHOT：每个行业，都可以有自己的 AIHOT。很多条信源流进中间的精选，再分给法律、人力资源、金融等各个行业" width="100%">
-  </picture>
-</p>
+# PrecisionAGHOT
 
-<p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-176b75?style=flat-square" alt="MIT License"></a>
-  <img src="https://img.shields.io/badge/Node.js-24-176b75?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js 24">
-  <img src="https://img.shields.io/badge/PostgreSQL-17-176b75?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL 17">
-  <img src="https://img.shields.io/badge/Docker-Compose-176b75?style=flat-square&logo=docker&logoColor=white" alt="Docker Compose">
-  <a href="https://aihot.news"><img src="https://img.shields.io/badge/demo-aihot.news-202a30?style=flat-square" alt="aihot.news"></a>
-</p>
+一个面向全球精准农业生态的中文热点与行业日报网站。持续关注农业科技、农机装备和实际落地：自动转向与 GNSS/RTK 导航、智能作业终端、变量作业、无人机、传感器与物联网、农业机器人、水肥管理，以及农场软件、数据平台和技术服务。
 
-<p align="center">
-  <b>一个自己找热点、自己写日报的网站框架。</b><br>
-  把信源换成你的，把精选标准换成你的 KnowHow，它就是你的行业热点站。
-</p>
+本项目是 [AIHOT](https://github.com/KKKKhazix/AIHOT) 的精准农业定制版。**原始框架作者是 AI 自媒体博主数字生命卡兹克（卡哥）**，感谢卡哥创作并开源这套框架。PrecisionAGHOT 在上游基础上扩展农业行业配置、全球信源与阅读界面，使用独立站名和品牌。
 
-<p align="center">
-  <a href="#跑起来">跑起来</a> ·
-  <a href="docs/customize.md">改成你的行业</a> ·
-  <a href="#它是怎么工作的">它是怎么工作的</a> ·
-  <a href="#文档">文档</a>
-</p>
+## 功能
 
-<br>
+- 从 RSS、网页列表和公开 JSON 列表采集，支持有界分页、日期补齐和跨源去重。
+- 模型完成行业预筛、双次评分、中文摘要、分类和事件归组；付费请求经过回执复用和预算熔断。
+- 首页展示最新来源动态与行业精选，支持分类、标签、主题和中英文搜索。
+- 热点按过去 48 小时独立来源参与度排序；日报、周报、月报按刊期生成。没有合格生成结果时，页面说明原因并提供真实来源动态。
+- 提供 RSS、公开 HTTP API、MCP 与管理后台，所有公开出口遵循同一读取规则。
+- 黑白灰界面，支持浅色与深色模式，适配手机和桌面阅读。模型榜和 Codex 重置监控在农业版本中关闭。
 
-## 这是什么
+## 信源与数据
 
-[AIHOT](https://aihot.news) 是我做的一个 AI 热点网站。它每天从一批信源里收资料，用大模型先筛一遍、再独立打两次分，挑出真正值得看的，写成中文标题和摘要；把不同来源说的同一件事聚成一个事件，按有多少人在说排出热点；每天早上出一份日报。
+配置覆盖厂商、农业软件平台、研究机构、协会和行业媒体，范围包括中国、北美、欧洲、澳新、非洲与拉美。自动转向、智能装备、农场软件、传感器、水肥管理、农业机器人和技术服务都在关注范围内。当前配置含 **68 个启用信源**，完整列表见 [信源目录](docs/sources-catalog.md) 与 [industry/sources.json](industry/sources.json)。新增配置经过本项目实际采集器验证；网站或 RSS 地址今后仍可能变化，运行健康状态以后台为准。
 
-这个仓库是它的完整框架：网站、后台、精选流程、聚簇和热度算法，**所有提示词的原文和入选门槛**，都在这里。
+新来源首次最多回灌 200 条、24 个月历史，后续每轮最多 300 条；网页分页按各源实际结构限制，最多 10 页。历史报道保留原文发布日期，缺少可核实日期的候选不入库。相同发布机构的多个栏目共用热度参与者分组。
 
-## 为什么开源
+开源仓库包含代码、行业配置和测试夹具，运行时数据库与抓取材料不随仓库分发。新克隆项目需要配置模型并启用采集；种子脚本只导入信源和主题，不会生成新闻。新闻原文版权归发布方，默认只公开中文摘要和原文链接。
 
-这半年，很多做法律、做 HR、做金融、做贵金属的朋友问我，能不能也给他们的行业做一个。
+精选标准保留内容类型、五个维度加权、噪声压制和安全边界。现有评分门槛尚未用农业标注样本重新校准，详见 [精准农业版本说明](docs/precision-agriculture.md)。全部动态订阅为 `/feed/all.xml`；`/feed.xml` 读取精选。
 
-我做不了。我不懂你们的行业，不知道哪些信源有用，也不知道什么样的消息，对你们来说才叫热点。
+## 关注范围
 
-但你们懂。
-
-既然我没办法满足所有人，那就把火种交到大家自己手上。
-
-## 说在前面
-
-- **我不是专业的开发者。** 我是设计师出身，半年前还看不太懂代码。这套代码是我和 AI 一起重写的，比以前干净了很多，但一定还有写得不好的地方。发现问题欢迎提 Issue，我不一定能很快回复，先说声抱歉。
-- **这是一份快照。** 它来自 AIHOT 正在线上跑的代码，不是精心打磨的通用框架。以后 AIHOT 的更新，我会尽量同步过来，但没法保证每一次都同步。
-- **里面没有 AIHOT 的信源名单和运营数据。** 仓库带了 18 个公开的海外 AI 资讯源做示范，够你跑起来看效果；真正的信源，要换成你自己行业的。
-- **请不要用 AIHOT 的名字和 Logo。** 换上你自己的名字，它就是你的站。
-
-## 它是怎么工作的
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/how-dark.png">
-  <img src="docs/assets/how-light.png" alt="六步：采集、预筛、两次评分、写作、聚簇、热点与成刊" width="100%">
-</picture>
-
-一条资料从信源进来，先判重，再预筛；可能重要的独立打两次分，过了门槛才进精选；然后写中文标题和摘要，和别的报道聚成事件，算进热度，最后进日报。每一步的提示词都在 [`industry/prompts/`](industry/prompts/)，改标准不用改代码。详见 [精选与校准](docs/selection.md)。
-
-### 聚簇与热点
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/cluster-dark.png">
-  <img src="docs/assets/cluster-light.png" alt="五个来源的报道聚成一个事件，事件进入当前热点榜" width="100%">
-</picture>
-
-同一件事，官网发一篇、媒体转十篇、X 上吵一天，读者只需要看到一次。AIHOT 把它们聚成一个**事件**：先用标题摘要的向量在最近两周里找候选，再让模型判断是同一件事、后续进展，还是两件事；拿不准的合并，换一家模型再确认一遍。
-
-**热度**按事件算，不按文章算：48 小时内，每个独立来源只算一次，24 小时减半。重复抓取不会多算，一家媒体发十篇也只算一次，所以排在前面的，是真正有很多人在说的事。
-
-### 速度
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/perf-dark.png">
-  <img src="docs/assets/perf-light.png" alt="AIHOT 线上实测：页面中位数 10 毫秒，95% 在 50 毫秒内；接口中位数 6 毫秒，95% 在 12 毫秒内；文章页 95% 在 14 毫秒内" width="100%">
-</picture>
-
-## 你会得到什么
-
-| | |
+| 方向 | 关注内容 |
 |---|---|
-| **六种信源** | RSS、网页列表、JSON 接口、X 账号、微信公众号，以及你自己脚本推送进来的内容。信源分级（官方一手 / 媒体个人），抓取频率按产出自动调整 |
-| **精选** | 预筛，同一份评分标准独立打两次分，再按信源分级的门槛决定入选。提示词和门槛全部公开，全部可以改；用你自己标注的样本在 SelectBench 里校准 |
-| **写作** | 中文标题、答案先行的摘要、推荐理由、标签，外文全文翻译；防止模型把原文没提到的公司写进标题 |
-| **聚簇** | 不同来源报道的同一件事聚成一个事件，后续进展挂在同一个事件下，事件页有综述；人工改过的归属不会被覆盖 |
-| **热点** | 按事件算热度：独立来源越多越靠前，X 上的讨论也算进来；和 6 小时前比，涨得快的标上升，新出现的标“新” |
-| **日报、周报、月报** | 每天 08:00 出日报，每周一出周报，每月 1 日出月报，按分类分节，带导语 |
-| **主题与搜索** | 公司、方向、内容形态三类主题页；标题摘要搜索和全文相关搜索 |
-| **给 Agent 用** | RSS（精选、全部、全文、日报）、公开 API、MCP、`llms.txt`，同一份内容给人看也给 Agent 用 |
-| **后台** | 信源管理与试抓、内容诊断、精选评测、每一步单独换模型、付费服务的预算熔断、运行记录与告警 |
-| **AI 专属模块** | 模型榜（汇总多家公开评测，方法公开）和 Codex 重置监控。别的行业一个开关关掉 |
+| 农机装备与智能作业 | 拖拉机、农具、智能终端、ISOBUS、变量作业与精准施用 |
+| 导航与自动转向 | GNSS/RTK、自动转向、引导系统、农机控制与兼容性 |
+| 无人机与农业机器人 | 测绘、植保、播撒、除草、采收与自主田间作业 |
+| 遥感、传感器与水肥 | 卫星/地面监测、物联网、土壤传感、灌溉控制与水肥一体化 |
+| 软件与数据平台 | FMIS/FMS、农场 ERP、农艺决策、数据互通、设备联网与数字化运营 |
+| 技术服务与产业 | RTK/导航服务、遥感分析、作业服务、农艺支持、合作并购与政策研究 |
 
-## 看一眼
+阅读和呈现以中文为主，信源范围面向全球。摘要重点交代产品何时可用、在哪些地区/作物上适用、已有何种田间证据，以及效率、成本、兼容性和规模化部署的变化。
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/shots-dark.png">
-  <img src="docs/assets/shots-light.png" alt="首页的当前热点与精选，关于页的信源河" width="100%">
-</picture>
+## 本地预览
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/board-dark.png">
-  <img src="docs/assets/board-light.png" alt="模型榜" width="100%">
-</picture>
+需要 **Node.js 24.11+** 和 **PostgreSQL 16 或 17**，或使用带 Compose 的 Docker。部署方式见 [部署文档](docs/deploy.md)。
 
-<p align="center"><sub>截图来自用示范信源跑起来的本地站，站名是默认的 MyHOT。</sub></p>
-
-## 跑起来
-
-需要 [Docker](https://docs.docker.com/get-docker/)，和一个 OpenAI 兼容的模型 API Key（DeepSeek、千问、智谱都可以）。
+在项目根目录执行：
 
 ```bash
-git clone https://github.com/KKKKhazix/AIHOT.git myhot
-cd myhot
-node scripts/init-env.ts --llm-key <你的模型 API Key>
-docker compose up -d --build
+npm ci
+node scripts/init-env.ts
+createdb precisionaghot
 ```
 
-打开 <http://localhost:3000>。后台在 `/admin`，管理员密码在 `.env` 的 `ADMIN_PASSWORD` 里。一两分钟后开始有内容，第一次导入的资料大约半小时处理完。
+`init-env.ts` 生成本地 `.env` 和管理员密码。将下面的本地地址配置写入 `.env`，保留其余生成的随机密钥：
 
-机器上没有 Node、服务器在中国大陆、要配域名和 HTTPS，见 [部署](docs/deploy.md)。
-
-## 把它改成你的行业
-
-最省事的办法：打开你的 Agent（Claude Code、Codex 都可以），把这个仓库交给它，然后说：
-
-```text
-请读 AGENTS.md 和 docs/customize.md，把这个站改成「法律」行业的热点站。
-我关心的是：……（你想盯哪些信源，你觉得什么消息重要、什么不重要，越具体越好）。
+```dotenv
+DATABASE_URL=postgres://你的本机用户名@127.0.0.1:5432/precisionaghot
+API_BASE_URL=http://127.0.0.1:3001
+SITE_URL=http://localhost:3000
+COLLECT_ENABLED=false
+MODEL_CALLS_ENABLED=false
+FEISHU_CONTENT_PUSH_ENABLED=false
+FEISHU_INTERNAL_ENABLED=false
+INDEXNOW_SUBMIT_ENABLED=false
 ```
 
-要改的东西几乎都在 [`industry/`](industry/) 这一个文件夹里，代码基本不用动：
+初始化并构建：
 
-| 文件 | 改什么 |
-|---|---|
-| `site.ts` | 站名、行业词、首页文案、关于页 |
-| `taxonomy.ts`、`topics.json` | 分类、标签、主题 |
-| `sources.json` | 首次启动时导入的信源 |
-| `prompts/` | 精选标准和写作要求。**你的行业 KnowHow，就写在这里** |
-| `selection.ts` | 入选门槛 |
-| `features.ts` | 模型榜、Codex 重置监控的开关 |
-| `brand/`、`pages/` | 图标、使用规则和隐私说明 |
+```bash
+node --env-file=.env scripts/migrate.ts
+node --env-file=.env scripts/seed.ts
+npm run build -w @aihot/web
+```
 
-最值得花时间的是评分标准（`prompts/selection-score.md`）和门槛：拿一两百条你自己标注过的资料，用 `scripts/eval-selection.ts` 跑一遍，看它选得准不准，再回去改。怎么做写在 [精选与校准](docs/selection.md) 里。
+如需先导入经过人工核对的来源摘要，保持上述安全开关关闭，在 Node.js 24 下运行：
+
+```bash
+node --env-file=.env scripts/import-curated.ts --input .data/your-curated-materials.json
+```
+
+输入是 JSON 数组或含 `items` 数组的对象。每项包含已有 `sourceId`、真实 `url`、`originalTitle`（或 `title`）、原始 `publishedAt`、人工 `titleZh` / `summaryZh`、合法 `category` 和 `tags`，可附 `subjects` 与核对证据 `evidence`。导入器保留原日期和来源，只发布摘要与原文链接，记录人工整理且不设置评分或精选。重复导入会跳过已有稿件，不覆盖后续人工修改；材料应留在被 Git 忽略的 `.data/`。
+
+分别在三个终端中运行：
+
+```bash
+node --env-file=.env apps/api/src/main.ts
+node --env-file=.env apps/worker/src/main.ts
+NODE_ENV=production node --env-file=.env apps/web/server.ts
+```
+
+打开 <http://localhost:3000>，后台在 `/admin`。以上配置用于预览，不会自动抓取或调用模型。后台源码和 npm workspace 名仍沿用 `@aihot/*`，以保留框架接口兼容性，网站显示使用 PrecisionAGHOT。
+
+使用 Docker 时，先生成 `.env`、确认安全开关关闭，再执行 `docker compose up -d --build`；Docker 内部数据库连接无需填写上述本机 `DATABASE_URL`。原部署文档中的 `myhot` 是目录/数据库示例，可替换为自己的名称。
+
+## 开始实际采集
+
+先确认候选信源及分类，配置 `.env` 中的 `LLM_BASE_URL`、`LLM_API_KEY` 和 `LLM_MODEL`，再主动开启 `COLLECT_ENABLED` 与 `MODEL_CALLS_ENABLED`。模型调用只在 worker 任务中发生，并经过回执和预算熔断；读者打开网页不触发模型调用。
+
+默认公开摘要和原文链接，`site_fulltext` 与 `syndicate_fulltext` 保持关闭。信源的官网或 RSS 可访问，并不等于有权转载全文。已有数据库中的信源不会被种子配置覆盖，需要在后台逐项调整。
+
+公开部署前还需配置实际 `SITE_URL`、域名、HTTPS、备份、访问日志和联系渠道，并由运营者确认 [使用规则模板](industry/pages/terms.md) 与 [隐私说明模板](industry/pages/privacy.md)。本次行业改造未代替这些决定。
+
+## 开发检查
+
+```bash
+npm run typecheck
+DATABASE_URL=postgres://127.0.0.1:5432/precisionaghot_test node scripts/migrate.ts
+DATABASE_URL=postgres://127.0.0.1:5432/precisionaghot_test npm test
+npm run build -w @aihot/web
+node --test apps/web/tests/*.test.ts
+node scripts/smoke.ts --base http://localhost:3000
+```
+
+测试库先自行创建为空库，名称必须以 `_test` 或 `_ci` 结尾。测试提供商使用本地 stub；不要加载真实凭据或调用外部服务。烟雾检查需要先启动网站。
 
 ## 文档
 
 | 文档 | 内容 |
 |---|---|
-| [把它改成你的行业](docs/customize.md) | 站名、分类、信源、提示词、门槛、品牌，一步一步来 |
-| [信源](docs/sources.md) | 六种信源怎么配，分级和全文，外部推送接口 |
-| [精选与校准](docs/selection.md) | 一条资料怎么变成精选，怎么用自己的样本校准 |
-| [事件归组与关系评测](docs/grouping.md) | 事件关系怎么判断，怎么用自己的 pairwise gold set 评测 |
-| [部署](docs/deploy.md) | Docker、域名和 HTTPS、中国大陆、更新、备份、花多少钱 |
-| [架构](docs/architecture.md) | 三个进程、几条不变的规则、目录、对外出口 |
-| [模型榜与 Codex 重置监控](docs/leaderboard.md) | 两个 AI 专属模块 |
+| [精准农业版本说明](docs/precision-agriculture.md) | 行业边界、编辑原则、启用与上线前的事项 |
+| [行业定制](docs/customize.md) | 行业包配置方法，上游默认例子仍用于说明接口 |
+| [信源](docs/sources.md) | 六种采集方式、分级、全文授权与外部推送 |
+| [精选与校准](docs/selection.md) | 双次评分、标注样本和门槛校准 |
+| [事件归组与关系评测](docs/grouping.md) | 同一事件、后续进展与关系评测 |
+| [部署](docs/deploy.md) | Docker、本机进程、域名与 HTTPS、备份 |
+| [架构](docs/architecture.md) | API、worker、SSR 网站和统一公开读取层 |
 
-技术栈：Node.js 24 · TypeScript · React Router（服务端渲染）· Fastify · PostgreSQL · pg-boss · Tailwind CSS · Docker Compose。
+技术栈：Node.js · TypeScript · React Router · Fastify · PostgreSQL · pg-boss · Tailwind CSS · Docker Compose。
 
-## 最后
+## 许可与致谢
 
-AIHOT 曾经只是我无数个深夜里，一个很小、很小的念头。
+**鸣谢卡哥。** 原始框架由 AI 自媒体博主 **数字生命卡兹克** 创作，原项目为 [KKKKhazix/AIHOT](https://github.com/KKKKhazix/AIHOT)。感谢卡哥提供采集、双次筛选、事件归组、日报与开放接口的基础。本项目是基于上游的农业定制与界面改造；原作者版权声明和提交历史均予以保留。
 
-我不知道它会被改成什么样子，会走到多远的地方。但这可能就是开源最浪漫的地方。
-
-剩下的路，就交给你们了。
-
-<p align="right">—— 数字生命卡兹克</p>
-
-## 许可
-
-代码使用 [MIT 许可证](LICENSE)。AIHOT 的名字和 Logo 不在许可范围内。字体、模型厂商和评测来源的标志各有自己的许可和商标归属，见 [NOTICE](NOTICE)。
-
----
-
-<sub>**In English:** AIHOT ([aihot.news](https://aihot.news)) is an AI news site that collects from many sources, lets a language model filter and score every item twice, writes Chinese headlines and summaries, clusters reports of the same story into one event, ranks events by how many independent sources discuss them, and publishes a daily briefing. This repository is its complete framework, including every prompt and threshold. Hand it to your coding agent with `AGENTS.md` and `docs/customize.md` to turn it into a news site for your own field. The documentation is in Chinese.</sub>
+本项目与农业定制改动以 [MIT 许可证](LICENSE) 开源。AIHOT 的名字和 Logo 不在许可范围内，本版本使用独立站点品牌。字体、模型厂商和其他第三方资产有各自的许可和商标归属，见 [NOTICE](NOTICE)。

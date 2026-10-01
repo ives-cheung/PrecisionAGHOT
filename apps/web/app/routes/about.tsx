@@ -7,7 +7,7 @@ import { ABOUT, SITE, withSubject } from "@aihot/industry/site";
 import { organizationLd, pageMeta } from "../lib/seo";
 import { Kicker } from "../components/ui/Kicker";
 import { buttonClass } from "../components/ui/Controls";
-import { IconArrowRight } from "../components/icons";
+import { IconArrowRight, IconArrowUpRight } from "../components/icons";
 import { SignalRiver, type RiverSource } from "../features/about/SignalRiver";
 
 /** Shared caches may keep this page for five minutes. */
@@ -45,7 +45,7 @@ function Figure({ n, unit }: { n: number; unit: string }) {
   const f = figure(n);
   return (
     <div className="flex items-baseline gap-1.5">
-      <span className="num text-[30px] font-black leading-none tracking-[-0.03em] text-ink xl:text-[36px]">{f.value}</span>
+      <span className="num text-[30px] font-medium leading-none tracking-[-0.03em] text-ink xl:text-[34px]">{f.value}</span>
       <span className="text-[13px] text-ink-3">
         {f.unit}
         {unit}
@@ -63,14 +63,14 @@ const KIND_ORDER: Array<[string, string]> = [
 ];
 
 /**
- * The stage columns' rules: one column on phones, two by two from sm, and from lg four in a row whose
+ * The stage columns' rules: one column on phones, two by two from sm, and from xl four in a row whose
  * edges fall on the river's stage boundaries.
  */
 const STAGE_CELL = [
-  "sm:pr-6 lg:pr-6",
-  "border-t sm:border-l sm:border-t-0 sm:pl-6 lg:px-6",
-  "border-t sm:pr-6 lg:border-l lg:border-t-0 lg:px-6",
-  "border-t sm:border-l sm:pl-6 lg:border-t-0 lg:px-6",
+  "sm:pr-6 xl:pr-6",
+  "border-t sm:border-l sm:border-t-0 sm:pl-6 xl:px-6",
+  "border-t sm:pr-6 xl:border-l xl:border-t-0 xl:px-6",
+  "border-t sm:border-l sm:pl-6 xl:border-t-0 xl:px-6",
 ];
 
 interface Stage {
@@ -142,10 +142,10 @@ function Maker({ maker, contact }: { maker: NonNullable<typeof ABOUT.maker>; con
     contact.feishuQr && maker.feishu ? <QrCard key="feishu" src={contact.feishuQr} kind="飞书群" title={maker.feishu.title} note={maker.feishu.note} /> : null,
   ].filter(Boolean);
   return (
-    <section aria-labelledby="maker" className="mt-20 grid gap-10 xl:mt-28 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
+    <section aria-labelledby="maker" className="mt-14 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
       <div>
         <Kicker>做这个站的人</Kicker>
-        <h2 id="maker" className="mt-4 flex items-center gap-3.5 text-[26px] font-black leading-[1.3] tracking-[-0.02em] text-ink xl:gap-4 xl:text-[34px]">
+        <h2 id="maker" className="mt-4 flex items-center gap-3.5 text-[26px] font-semibold leading-[1.3] tracking-[-0.02em] text-ink xl:text-[30px]">
           {contact.makerAvatar && <MakerFace src={contact.makerAvatar} />}
           <span>
             嗨，我是 <span className="whitespace-nowrap text-accent">{maker.name}</span>
@@ -209,27 +209,27 @@ export default function AboutPage() {
   }, [latest.length]);
 
   return (
-    <div className="mx-auto max-w-[var(--page-max-reading)] pb-14 pt-6 lg:pt-3">
-      <header className="grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_auto]">
+    <div className="mx-auto max-w-[var(--page-max-reading)] pb-10 pt-7 lg:pt-1">
+      <header className="grid gap-6">
         <div>
           <Kicker>{ABOUT.kicker}</Kicker>
-          <h1 className="mt-5 text-[34px] font-black leading-[1.18] tracking-[-0.03em] text-ink [text-wrap:balance] sm:text-[46px] xl:text-[56px] 2xl:text-[64px]">
+          <h1 className="mt-5 text-[30px] font-medium leading-[1.35] tracking-[-0.04em] text-ink [text-wrap:balance] sm:text-[40px] xl:text-[46px]">
             {ABOUT.headline[0]}
             <br />
             <span className="text-accent">{ABOUT.headline[1]}</span>
           </h1>
-          <p className="mt-5 max-w-[36em] text-[15.5px] leading-[1.85] text-ink-3 xl:text-[17px]">
+          <p className="page-lead mt-5">
             {ABOUT.lead.split("{sources}").map((part, i) => (
               <span key={i}>
-                {i > 0 && (stats ? <span className="num font-semibold text-ink">{stats.sources}</span> : "上百")}
+                {i > 0 && (stats ? <span className="num font-medium text-ink">{stats.sources}</span> : "若干")}
                 {part}
               </span>
             ))}
           </p>
         </div>
-        <div className="flex flex-wrap gap-3 lg:pb-2">
+        <div className="flex flex-wrap gap-3">
           <Link to="/" prefetch="intent" className={buttonClass("primary", "lg")}>
-            看今天的精选 <IconArrowRight size={15} />
+            浏览最新动态 <IconArrowRight size={15} />
           </Link>
           <Link to="/daily" prefetch="intent" className={buttonClass("secondary", "lg")}>
             读最新{withSubject("日报")}
@@ -237,16 +237,24 @@ export default function AboutPage() {
         </div>
       </header>
 
-      <section aria-labelledby="how" className="mt-10 xl:mt-14">
-        <h2 id="how" className="sr-only">
-          {SITE.name} 怎么工作
-        </h2>
-        <SignalRiver sources={sources} focus={focus} onArrive={onArrive} className="h-[230px] sm:h-[300px] lg:h-[360px] 2xl:h-[420px]">
-          <Latest item={latest[at]} className="absolute left-[75%] top-[calc(42%+42px)] hidden w-[25%] px-6 lg:block" />
+      <section aria-labelledby="acknowledgments" className="mt-9 rounded-card border border-line bg-bg-sunk px-5 py-6 sm:mt-10 sm:px-7 sm:py-7">
+        <p className="eyebrow">开源鸣谢</p>
+        <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
+          <h2 id="acknowledgments" className="section-title">感谢卡哥 · {ABOUT.acknowledgments.name}</h2>
+          <a href={ABOUT.acknowledgments.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[13px] text-ink-3 underline-offset-4 hover:text-ink hover:underline">查看原始开源项目 <IconArrowUpRight size={14} /></a>
+        </div>
+        <p className="mt-3 max-w-[56em] text-[14px] leading-[1.9] text-ink-3">{ABOUT.acknowledgments.description}</p>
+      </section>
+
+      <section aria-labelledby="how" className="mt-12">
+        <h2 id="how" className="section-title">从公开信源，到清晰可读的进展</h2>
+        <p className="mt-2 text-[13px] leading-relaxed text-ink-3">采集、归并、筛选与成刊。以下数字来自站内公开数据。</p>
+        <SignalRiver sources={sources} focus={focus} onArrive={onArrive} className="mt-5 h-[190px] sm:h-[240px] lg:h-[280px]">
+          <Latest item={latest[at]} className="absolute left-[75%] top-[calc(42%+42px)] hidden w-[25%] px-6 xl:block" />
         </SignalRiver>
         <p className="sr-only">示意图：每条线是一个信源；线汇成一束束，代表同一件事的多篇报道；经过精选的闸门，只有少数几束通过，汇入每天的{withSubject("日报")}。</p>
-        <Latest item={latest[at]} className="mt-2 border-t border-line pt-4 lg:hidden" />
-        <ol className="mt-4 grid grid-cols-1 border-t border-line-strong sm:grid-cols-2 lg:mt-0 lg:grid-cols-4">
+        <Latest item={latest[at]} className="mt-2 border-t border-line pt-4 xl:hidden" />
+        <ol className="mt-4 grid grid-cols-1 border-t border-line-strong sm:grid-cols-2 xl:mt-0 xl:grid-cols-4">
           {stages.map((s, i) => (
             <li
               key={s.no}
@@ -258,8 +266,8 @@ export default function AboutPage() {
               className={`border-line py-6 outline-none transition-colors ${STAGE_CELL[i]} ${focus === i ? "bg-accent-softer" : ""}`}
             >
               <div className="flex items-baseline gap-2.5">
-                <span className="num text-[12px] font-bold tracking-[0.12em] text-accent">{s.no}</span>
-                <h3 className="text-[17px] font-bold text-ink">{s.title}</h3>
+                <span className="num text-[12px] font-medium tracking-[0.12em] text-ink-4">{s.no}</span>
+                <h3 className="text-[17px] font-semibold text-ink">{s.title}</h3>
               </div>
               {s.figure && <div className="mt-4">{s.figure}</div>}
               <p className="mt-3 text-[14px] leading-[1.8] text-ink-3">{s.text}</p>
@@ -271,7 +279,7 @@ export default function AboutPage() {
 
       {ABOUT.maker && <Maker maker={ABOUT.maker} contact={contact} />}
 
-      <p className="mt-16 well rounded-card px-5 py-4 text-[13px] leading-[1.85] text-ink-3">
+      <p className="mt-12 border-t border-line pt-5 text-[13px] leading-[1.85] text-ink-3">
         {ABOUT.copyright}
         <Link to="/feedback" className="text-accent hover:underline">
           反馈页
