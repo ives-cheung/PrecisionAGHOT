@@ -52,9 +52,9 @@ const pad = (rank: number) => String(rank).padStart(2, "0");
 function Voices({ e }: { e: HotEntryView }) {
   const names = e.sourceNames.slice(0, 2).map(shortSourceName);
   return (
-    <span className="min-w-0 text-[12.5px] leading-snug text-ink-4">
-      {/* Lines break between the phrases, never inside one. */}
-      <span className="whitespace-nowrap">
+    <span className="min-w-0 flex-1 text-[12.5px] leading-snug text-ink-4">
+      {/* Long publisher names stay within the width left beside the heat index. */}
+      <span className="block truncate" title={e.sourceNames.join("、")}>
         {names.length > 0 && <span className="text-ink-3">{names.join("、")}</span>}
         {e.sourceCount > names.length ? ` 等 ${e.sourceCount} 个来源` : names.length ? " 报道" : `${e.sourceCount} 个来源`}
       </span>

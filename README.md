@@ -15,9 +15,27 @@
 
 ## 实际演示
 
-本地实例的首页实际运行截图（2026 年 10 月 1 日），展示真实采集并处理的农业科技动态。
+以下为本地实例的真实运行截图（2026 年 10 月 1 日），内容和数量会随采集更新。
 
-<img src="docs/screenshots/home-preview.png" alt="PrecisionAGHOT 首页实际运行截图：农业科技介绍、分类导航和最新动态" width="760" />
+**桌面首页** — 浏览全球农业科技动态与行业精选。
+
+<img src="docs/screenshots/home-desktop.jpg" alt="PrecisionAGHOT 桌面首页：农业科技介绍、分类导航与最新动态" width="960" />
+
+**行业热点** — 查看多家独立来源共同报道的事件、最新进展与热度变化。
+
+<img src="docs/screenshots/hot-desktop.jpg" alt="PrecisionAGHOT 真实热点榜：Massey Ferguson 新拖拉机系列、三个独立来源与热度走势" width="960" />
+
+**全部动态** — 按原文发布日期浏览中文摘要与来源。
+
+<img src="docs/screenshots/all-desktop.jpg" alt="PrecisionAGHOT 全部动态：报道数量、分类筛选、搜索与中文摘要" width="960" />
+
+**自动转向分类** — 聚焦自动转向、GNSS/RTK 导航和农机控制。
+
+<img src="docs/screenshots/guidance-desktop.jpg" alt="PrecisionAGHOT 自动转向分类：FJDynamics 田间使用体验与 FieldBee 产品进展" width="960" />
+
+**手机阅读** — 手机布局下的行业动态、横向分类与底部导航。
+
+<img src="docs/screenshots/home-mobile.jpg" alt="PrecisionAGHOT 手机首页实际运行截图" width="390" />
 
 ## 信源与数据
 
